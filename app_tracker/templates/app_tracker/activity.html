@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1><a href="{% url 'app_tracker:category' activity.category.id %}">{{activity.category}}</a> | Activity: <i>{{activity.name}}</i></h1>
+    <ul>
+        <li><a href="{% url "app_tracker:activity_edit" activity.id %}">Edit activity</a></li>
+        <li><a href="{% url "app_tracker:activity_delete" activity.id %}">Delete activity</a></li>
+    </ul>
+
+    <h2>Details</h2>
+    <p><b>Category:</b> {{activity.category}}</p>
+    <p><b>Time summary:</b> {{time_summary_activity}}</p>
+    
+    <p><b>Logs:</b></p>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <label for="date">Date</label><input name="date" id="date" type="date"> |
+        <label for="start_time">Start</label><input name="start_time" id="start_time" type="time"> |
+        <label for="log_time">Time to log</label><input name="log_time" id="log_time" step="2" type="time"> |
+        <input type="submit" value="Log time">
+    </form>
+    
+    <ol>
+        {% if all_activity_logs %}
+            {% for log in all_activity_logs %}
+                <li>{{log}} | {{log.start_time}} - <a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a> | <a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></li>
+            {% endfor %}
+        {% endif %}
+    </ol>    
+
+
+
+
+
+{% endblock content %}

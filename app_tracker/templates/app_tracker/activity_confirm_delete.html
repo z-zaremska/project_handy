@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<p>Are you sure you want delete <b>{{activity.name}}</b> activity with all connected (number of logs) logs?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Delete activity">
+</form>
+
+<ol>
+    <li>Wyświetlić wszystkie powiązanie logi.</li>
+    <li>Wyświetlić ilość logów.</li>
+    <li>Powrót do powiązaniej kategorii (nie do strony głównej aplikacji).</li>
+</ol>
+
+{% endblock content %}

@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <label for="name">Name</label><input name="name" id="name" type="text" value="{{ activity.name }}"><br>
+    <label for="color">Color</label>
+    <select name="color" id="color">
+        <option value="gray">gray</option>
+        <option value="yellow">yellow</option>
+        <option value="purple">purple</option>
+        <option value="orange">orange</option>
+    </select>
+    <br><br>
+    <input type="submit" value="Save changes">
+</form>
+
+<ol>
+    <li>Wywala strone przy nie uzupelnieniu calego formularza podczas edycji.</li>
+    <li>Zamiast osobnej strony mogloby sie pojawiac okienko edycji na stronie aktywności.</li>
+</ol>
+{% endblock content %}

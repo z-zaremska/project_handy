@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form method="POST" action="">
+    {% csrf_token %}
+    <label for="date">Date</label><input name="date" id="date" type="date" value="{{timelog.date|date:'Y-m-d'}}" /> |
+    <label for="start_time">Start</label><input name="start_time" id="start_time" type="time" value="{{timelog.start_time|time:'H:i'}}"> |
+    <label for="log_time">Time to log</label><input name="log_time" id="log_time" type="time" step="2" value="{{timelog.log_time|time:'H:m:s'}}"> |
+    <input type="submit" value="Save changes">
+</form>
+
+<ol>
+    <li>Wywala strone przy nie uzupelnieniu calego formularza podczas edycji.</li>
+    <li>Nie wyświetla aktualnie zalogowanych danych.</li>
+    <li>Zamiast osobnej strony mogloby sie pojawiac okienko edycji na stronie aktywności.</li>
+</ol>
+{% endblock content %}

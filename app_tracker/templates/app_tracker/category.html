@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Category: <i>{{category.name}}</i></h1>
+    <ul>
+        <li><a href="{% url 'app_tracker:category_edit' category.id %}">Edit category</a>
+        <li><a href="{% url 'app_tracker:category_delete' category.id %}">Delete category</a>
+    </ul>
+
+    <h2>Description</h2>
+    <p>{{category.description}}</p>
+
+    <h2>Summary</h2>
+
+    <p>Podsumowanie calej categorii:<br>
+        <strike>- suma godzin ze wszystkich aktywnosci w categorii</strike><br>
+        - wykres zbiorczy dla kazdej aktywnosci oraz dla calej categorii z uwzglednieniem wybranej wczesniej kolorystyki<br>
+    <br>    
+    --------------------------------------------<br>
+    Tabela zestawiająca wszystkie aktywności:<br>
+        - suma spedzonych godzin na kazda aktywnosc<br>
+        - data ostatniego loga na dana aktywnosc<br>
+    <strike>- link do podgladu poszczegolnej aktywnosci</strike><br>
+        - wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia<br>
+        - usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia:
+            - aktywnosc i logi
+            - aktywnosc bez logow (logi przypisywane do null)
+    </p>
+
+    <h3>All time:</h3>
+    {% if category_time%}
+        {{category_time}}
+    {% else %}
+        <p>No time logged yet.</p>
+    {% endif %}
+
+    <h3>All activities:</h3>
+    {% if all_category_activities %}
+        <ul>
+            {% for activity in all_category_activities %}
+                <li><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></li>    
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+{% endblock content %}

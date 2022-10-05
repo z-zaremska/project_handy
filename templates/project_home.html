@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<h1>This is the Handy project.</h1>
+
+<h2>Getting closer</h2>
+<a href="{% url 'about_me' %}">About me</a><br>
+<a href="{% url 'resume' %}">Resume</a><br>
+
+<h2>Project handy</h2>
+<a href="{% url 'app_tracker:tracker_home' %}">Goal Tracker</a><br>
+Weather app<br>
+To-do list<br>
+{% endblock content %}
