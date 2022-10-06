@@ -2,10 +2,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.contrib import messages
 from app_tracker.models import Category, Activity, TimeLog
-from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm
+from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
 from django.views.generic import TemplateView, DeleteView
 from datetime import timedelta
 from django.db.models import Sum
+import plotly.express as px
 
 # Create your views here.
 class TrackerHomeTemplateView(TemplateView):
@@ -74,10 +75,49 @@ def activity(request, activity_id):
             new_timelog.save()    
             messages.success(request, ("New log has been created!"))
 
+    #Chart(date vs. logged time)
+    interval_start = request.GET.get('interval_start')
+    interval_end = request.GET.get('interval_end')
+    chart_interval_form = ChartTimeIntervalForm()
+
+    if interval_start:
+        all_logs = all_logs.filter(date__gte=interval_start)
+    if interval_end:
+        all_logs = all_logs.filter(date__lte=interval_end)
+     
+    x_data = [log.date for log in all_logs]
+    y_data = [log.log_time for log in all_logs]
+
+    fig = px.line(
+        x = x_data,
+        y = y_data,
+        markers=True,
+        title=f"How is {activity.name} activity going",
+        labels={
+            'x': 'Date',
+            'y': 'Time',
+        },
+    )
+
+    fig.update_layout(
+        title = {
+            'font_size': 22,
+            'xanchor': 'center',
+            'x': 0.5,
+        }
+    )
+    
+    chart = fig.to_html()
+    
+    #Context
     context = {
         'activity': activity,
         'all_activity_logs': all_logs,
         'time_summary_activity': time_summary_activity,
+        'chart': chart,
+        'chart_interval_form': chart_interval_form,
+        'interval_start': interval_start,
+        'interval_end': interval_end, 
     }
 
     return render(request, 'app_tracker/activity.html', context)

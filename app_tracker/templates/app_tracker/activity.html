@@ -11,7 +11,6 @@
     <h2>Details</h2>
     <p><b>Category:</b> {{activity.category}}</p>
     <p><b>Time summary:</b> {{time_summary_activity}}</p>
-    
     <p><b>Logs:</b></p>
     <form method="POST" action="">
         {% csrf_token %}
@@ -27,7 +26,24 @@
                 <li>{{log}} | {{log.start_time}} - <a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a> | <a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></li>
             {% endfor %}
         {% endif %}
-    </ol>    
+    </ol>
+    
+    {% comment %} Chart (date x time log) {% endcomment %}
+    {{ chart|safe }}
+    <center>
+        <h4>({{interval_start}} - {{interval_end}} )</h4>
+        * ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano)
+    </center>
+
+
+    <center>
+        <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
+            From {{chart_interval_form.interval_start}} to {{chart_interval_form.interval_end}}
+            <input type="submit" value="Set time interval">
+            <br><br>
+            * dodać resetowanie przedzialu czasowego
+        </form>
+    </center>
 
 
 
