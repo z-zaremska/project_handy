@@ -9,6 +9,17 @@
     </ul>
 
     <h2>Details</h2>
+    <ol>
+        <li>Ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano).</li>
+        <li>Strona nie działa jeżeli nie ma zadeklarowanych żadnych godzin.</li>
+        <li>Dodać przycisk resetu przedziału czasowego.</li>
+        <li>Dostosować wielkość wykresu</li>
+        <li>Uzależnić kolor wykresu od wybranego koloru aktywności.</li>
+        <li>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm:ss (24h).</li>
+        <li>Dopracować wygląd wykresu.</li>
+    </ol>
+
+
     <p><b>Category:</b> {{activity.category}}</p>
     <p><b>Time summary:</b> {{time_summary_activity}}</p>
     <p><b>Logs:</b></p>
@@ -29,11 +40,12 @@
     </ol>
     
     {% comment %} Chart (date x time log) {% endcomment %}
-    {{ chart|safe }}
-    <center>
-        <h4>({{interval_start}} - {{interval_end}} )</h4>
-        * ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano)
-    </center>
+    {% if all_activity_logs %}
+        {{ activity_chart|safe }}
+        <center>
+            <h4>({{interval_start}} - {{interval_end}} )</h4>
+        </center>
+    {% endif %}
 
 
     <center>
@@ -41,12 +53,7 @@
             From {{chart_interval_form.interval_start}} to {{chart_interval_form.interval_end}}
             <input type="submit" value="Set time interval">
             <br><br>
-            * dodać resetowanie przedzialu czasowego
         </form>
     </center>
-
-
-
-
 
 {% endblock content %}

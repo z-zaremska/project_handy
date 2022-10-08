@@ -11,37 +11,70 @@
     <h2>Description</h2>
     <p>{{category.description}}</p>
 
-    <h2>Summary</h2>
-
-    <p>Podsumowanie calej categorii:<br>
-        <strike>- suma godzin ze wszystkich aktywnosci w categorii</strike><br>
-        - wykres zbiorczy dla kazdej aktywnosci oraz dla calej categorii z uwzglednieniem wybranej wczesniej kolorystyki<br>
-    <br>    
-    --------------------------------------------<br>
-    Tabela zestawiająca wszystkie aktywności:<br>
-        - suma spedzonych godzin na kazda aktywnosc<br>
-        - data ostatniego loga na dana aktywnosc<br>
-    <strike>- link do podgladu poszczegolnej aktywnosci</strike><br>
-        - wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia<br>
-        - usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia:
-            - aktywnosc i logi
-            - aktywnosc bez logow (logi przypisywane do null)
-    </p>
-
     <h3>All time:</h3>
-    {% if category_time%}
-        {{category_time}}
-    {% else %}
-        <p>No time logged yet.</p>
+    {{category_total_time}}
+
+    <h3>All category activities:</h3>
+    {% if category_all_activities %}
+        <table border callpadding="10">
+            <tr align='center' valign='middle'>
+                <th>No.</th>
+                <th>Activity</th>
+                <th>Color</th>
+                <th>Total declared time</th>
+                <th>Last activity</th>
+            </tr align='center' valign='middle'>
+            {% for activity in category_all_activities %}
+            <tr>
+                <th scope='row'></th>
+                <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
+                <td>{{activity.color}}</td>
+                <td>activity total time</td>
+                <td>las log</td>
+            </tr>
+            {% endfor %}
+            <tr align='center' valign='middle'>
+                <form method="POST">
+                    {% csrf_token %}
+                    <td>+</td>
+                    <td><input type="text" id="name" name="name"></td>
+                    <td>
+                        <select name="color" id="color"><br>
+                            <option value="gray">gray</option>
+                            <option value="yellow">yellow</option>
+                            <option value="purple">purple</option>
+                            <option value="orange">orange</option>
+                        </select>
+                    </td>
+                    <td colspan="2"><input type="submit" value="Create new activity"></td>            
+                </form>
+            </tr>
+        </table>
     {% endif %}
 
-    <h3>All activities:</h3>
-    {% if all_category_activities %}
-        <ul>
-            {% for activity in all_category_activities %}
-                <li><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></li>    
-            {% endfor %}
-        </ul>
-    {% endif %}
+    {{category_chart|safe}}
+
+
+    <p>Podsumowanie calej categorii:</p>
+    <ol>
+        <li><strike>Suma godzin ze wszystkich aktywnosci w categorii</strike></li>
+        <li>Wykres zbiorczy dla kazdej aktywnosci <strike>oraz dla calej categorii</strike> z uwzglednieniem wybranej wczesniej kolorystyki</li>
+        <li>Strona się wypierdala (przez wykres) gdy brak danych logowania</li>
+    </ol>   
+    --------------------------------------------<br>
+    <p>Tabela zestawiająca wszystkie aktywności:</p>
+    <ol>
+        <li>Suma spedzonych godzin na kazda aktywnosc</li>
+        <li>Numeracja wierszy w kolumnie</li>
+        <li>Data ostatniego loga na dana aktywnosc</li>
+        <li><strike>Link do podgladu poszczegolnej aktywnosci</strike></li>
+        <li>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia</li>
+        <li>Usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia
+            <ol>
+                <li>aktywnosc i logi</li>
+                <li>aktywnosc bez logow (logi przypisywane do null)</li>
+            </ol>
+        </li>
+    </ol>
 
 {% endblock content %}

@@ -7,8 +7,10 @@ from django.views.generic import TemplateView, DeleteView
 from datetime import timedelta
 from django.db.models import Sum
 import plotly.express as px
+from collections import defaultdict
 
-# Create your views here.
+# App home
+
 class TrackerHomeTemplateView(TemplateView):
     template_name = 'app_tracker/tracker_home.html'
 
@@ -17,25 +19,84 @@ class TrackerHomeTemplateView(TemplateView):
         context['categories'] = Category.objects.all()
         return context
 
+
 #Category
 
 def category(request, category_id):
     category = Category.objects.get(pk=category_id)
-    all_category_activities = Activity.objects.filter(category=category).all()
-    all_activities_time = []
-
-    if all_category_activities:
-        for activity in all_category_activities:
-            activity_time = activity.all_logs.aggregate(Sum('log_time'))['log_time__sum']
-            if activity_time != None:
-                all_activities_time.append(activity_time)
+    category_all_activities = Activity.objects.filter(category=category).all()
+    category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
     
-    category_time = sum(all_activities_time, timedelta())
+    category_total_time = "No time logged yet."
+    if category_all_logs:
+        category_total_time = category_all_logs.aggregate(Sum('log_time'))['log_time__sum']
 
+    #create new Activity
+    if request.method == "POST":
+        activity_form = ActivityForm(request.POST or None)
+
+        if activity_form.is_valid():
+            new_activity = activity_form.save(commit=False)
+            new_activity.category = category
+            new_activity.save()
+            messages.success(request, "New activity has been created!")
+      
+    #Chart data for Category
+
+    
+    #---> category chart data
+    category_logs_dates = [log.date for log in category_all_logs]
+    category_logs_time = [log.log_time for log in category_all_logs]    
+    
+    category_chart_data = defaultdict(timedelta)
+    for date, log in zip(category_logs_dates, category_logs_time):
+        if date in category_chart_data:
+            category_chart_data[date] += log
+        else:
+            category_chart_data[date] = log
+
+    x_category_data = [date for date in category_chart_data.keys()]
+    y_category_data = [log for log in category_chart_data.values()]
+    
+    #---> activity chart data for Activity
+    for activity in category_all_activities:
+        activity_logs_dates = [log.date for log in TimeLog.objects.filter(activity=activity)]
+        activity_logs_time = [log.log_time for log in TimeLog.objects.filter(activity=activity)]
+        activity_chart_data = defaultdict(timedelta)
+        for date, log in zip(activity_logs_dates, activity_logs_time): 
+            if date in activity_chart_data:
+                activity_chart_data[date] += log
+            else:
+                activity_chart_data[date] = log                
+
+    #---> chart configuration
+    fig = px.line(
+        x = x_category_data,
+        y = y_category_data,
+        markers=True,
+        title=f"How is <b>{category.name}</b> category going",
+        labels={
+            'x': 'Date',
+            'y': 'Time logged',
+        },
+    )
+
+    fig.update_layout(
+        title = {
+            'font_size': 22,
+            'xanchor': 'center',
+            'x': 0.5,
+        }
+    )
+    
+    category_chart = fig.to_html()
+    
+    #Context
     context = {
         'category': category,
-        'all_category_activities': all_category_activities,
-        'category_time': category_time,
+        'category_all_activities': category_all_activities,
+        'category_total_time': category_total_time,
+        'category_chart': category_chart,
     }
 
     return render(request, 'app_tracker/category.html', context)
@@ -58,6 +119,7 @@ def category_edit(request, category_id):
     else:
         return render(request, 'app_tracker/category_edit.html', {'category': category})
 
+
 #Activity
 
 def activity(request, activity_id):
@@ -73,9 +135,10 @@ def activity(request, activity_id):
             new_timelog = timelog_form.save(commit=False)
             new_timelog.activity = activity
             new_timelog.save()    
-            messages.success(request, ("New log has been created!"))
-
-    #Chart(date vs. logged time)
+            messages.success(request, ("New log has been created!")) 
+    
+    #Chart data for Activity
+    #---> adjusting chart time interval
     interval_start = request.GET.get('interval_start')
     interval_end = request.GET.get('interval_end')
     chart_interval_form = ChartTimeIntervalForm()
@@ -85,17 +148,29 @@ def activity(request, activity_id):
     if interval_end:
         all_logs = all_logs.filter(date__lte=interval_end)
      
-    x_data = [log.date for log in all_logs]
-    y_data = [log.log_time for log in all_logs]
+    #---> chart data
+    activity_logs_dates = [log.date for log in all_logs]
+    activity_logs_time = [log.log_time for log in all_logs]
 
+    activity_chart_data = defaultdict(timedelta)
+    for date, log in zip(activity_logs_dates, activity_logs_time):
+        if date in activity_chart_data:
+            activity_chart_data[date] += log
+        else:
+            activity_chart_data[date] = log
+
+    x_activity_data = [date for date in activity_chart_data.keys()]
+    y_activity_data = [log for log in activity_chart_data.values()]
+
+    #---> chart configuration
     fig = px.line(
-        x = x_data,
-        y = y_data,
+        x = x_activity_data,
+        y = y_activity_data,
         markers=True,
-        title=f"How is {activity.name} activity going",
+        title=f"How is <b>{activity.name}</b> activity going",
         labels={
             'x': 'Date',
-            'y': 'Time',
+            'y': 'Time logged',
         },
     )
 
@@ -107,14 +182,14 @@ def activity(request, activity_id):
         }
     )
     
-    chart = fig.to_html()
+    activity_chart = fig.to_html()
     
     #Context
     context = {
         'activity': activity,
         'all_activity_logs': all_logs,
         'time_summary_activity': time_summary_activity,
-        'chart': chart,
+        'activity_chart': activity_chart,
         'chart_interval_form': chart_interval_form,
         'interval_start': interval_start,
         'interval_end': interval_end, 
@@ -139,6 +214,7 @@ def activity_edit(request, activity_id):
 
     else:
         return render(request, 'app_tracker/activity_edit.html', {'activity': activity})
+
 
 #TimeLog
 
