@@ -6,8 +6,9 @@ from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTime
 from django.views.generic import TemplateView, DeleteView
 from datetime import timedelta
 from django.db.models import Sum
-import plotly.express as px
 from collections import defaultdict
+import pandas as pd
+import plotly.express as px
 
 # App home
 
@@ -26,6 +27,9 @@ def category(request, category_id):
     category = Category.objects.get(pk=category_id)
     category_all_activities = Activity.objects.filter(category=category).all()
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
+    colors = ['red']
+    for activity in category_all_activities:
+        colors.append(activity.color)
     
     category_total_time = "No time logged yet."
     if category_all_logs:
@@ -42,8 +46,6 @@ def category(request, category_id):
             messages.success(request, "New activity has been created!")
       
     #Chart data for Category
-
-    
     #---> category chart data
     category_logs_dates = [log.date for log in category_all_logs]
     category_logs_time = [log.log_time for log in category_all_logs]    
@@ -54,10 +56,13 @@ def category(request, category_id):
             category_chart_data[date] += log
         else:
             category_chart_data[date] = log
-
+ 
     x_category_data = [date for date in category_chart_data.keys()]
     y_category_data = [log for log in category_chart_data.values()]
-    
+
+    category_page_df = pd.Series(index=x_category_data, data=y_category_data, name=f'Category "{category.name}"').to_frame()
+    category_page_df.index.name = "Dates"
+
     #---> activity chart data for Activity
     for activity in category_all_activities:
         activity_logs_dates = [log.date for log in TimeLog.objects.filter(activity=activity)]
@@ -67,28 +72,35 @@ def category(request, category_id):
             if date in activity_chart_data:
                 activity_chart_data[date] += log
             else:
-                activity_chart_data[date] = log                
+                activity_chart_data[date] = log
+        x_activity_data = [date for date in activity_chart_data.keys()]
+        y_activity_data = [log for log in activity_chart_data.values()]
+        activity_data = pd.Series(index=x_activity_data, data=y_activity_data)
+        category_page_df[f'Activity "{activity.name}"'] = activity_data
 
-    #---> chart configuration
+    #category page data frame
+    print(category_page_df)
+   
     fig = px.line(
-        x = x_category_data,
-        y = y_category_data,
+        category_page_df,
+        x=category_page_df.index,
+        y=category_page_df.columns,
         markers=True,
-        title=f"How is <b>{category.name}</b> category going",
+        line_shape="spline",
+        color_discrete_sequence = colors,
+        title=f"Category <b>{category.name}</b> sum up",
         labels={
             'x': 'Date',
             'y': 'Time logged',
         },
     )
+    fig.update_traces(connectgaps=True)
 
-    fig.update_layout(
-        title = {
-            'font_size': 22,
-            'xanchor': 'center',
-            'x': 0.5,
-        }
-    )
-    
+    fig.update_layout({
+        'plot_bgcolor': 'white',
+        'paper_bgcolor': 'white',
+        })
+
     category_chart = fig.to_html()
     
     #Context
@@ -97,6 +109,7 @@ def category(request, category_id):
         'category_all_activities': category_all_activities,
         'category_total_time': category_total_time,
         'category_chart': category_chart,
+        'category_page_df': category_page_df,
     }
 
     return render(request, 'app_tracker/category.html', context)

@@ -8,11 +8,14 @@ COLOR_THEME_CHOICES = [
     ('yellow', 'yellow'),
     ('purple', 'purple'),
     ('orange', 'orange'),
+    ('blue', 'blue'),
+    ('green', 'green'),
+    ('pink', 'pink'),
 ]
 
 # Models
 class Category(models.Model):
-    name = models.CharField(max_length=30, default="category name")
+    name = models.CharField(max_length=30, default="category name", unique=True)
     description = models.CharField(max_length=100, default="category description")
     
     class Meta:
