@@ -5,7 +5,7 @@ from app_tracker.models import Category, Activity, TimeLog
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
 from django.views.generic import TemplateView, DeleteView
 from datetime import timedelta
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from collections import defaultdict
 import pandas as pd
 import plotly.express as px
@@ -31,10 +31,6 @@ def category(request, category_id):
     for activity in category_all_activities:
         colors.append(activity.color)
     
-    category_total_time = "No time logged yet."
-    if category_all_logs:
-        category_total_time = category_all_logs.aggregate(Sum('log_time'))['log_time__sum']
-
     #create new Activity
     if request.method == "POST":
         activity_form = ActivityForm(request.POST or None)
@@ -78,8 +74,11 @@ def category(request, category_id):
         activity_data = pd.Series(index=x_activity_data, data=y_activity_data)
         category_page_df[f'Activity "{activity.name}"'] = activity_data
 
-    #category page data frame
-    print(category_page_df)
+    #Total time for category and activity
+    category.total_time = category_page_df[f'Category "{category.name}"'].sum()
+    for activity in category_all_activities:
+        activity.total_time = category_page_df[f'Activity "{activity.name}"'].sum()
+        activity.last_log = activity.all_logs.latest('date', 'start_time')
    
     fig = px.line(
         category_page_df,
@@ -107,9 +106,7 @@ def category(request, category_id):
     context = {
         'category': category,
         'category_all_activities': category_all_activities,
-        'category_total_time': category_total_time,
         'category_chart': category_chart,
-        'category_page_df': category_page_df,
     }
 
     return render(request, 'app_tracker/category.html', context)
@@ -138,17 +135,6 @@ def category_edit(request, category_id):
 def activity(request, activity_id):
     activity = Activity.objects.get(pk=activity_id)
     all_logs = TimeLog.objects.filter(activity=activity).all()
-    time_summary_activity = activity.all_logs.aggregate(Sum('log_time'))['log_time__sum']
-
-    #Create new time log
-    if request.method == 'POST':
-        timelog_form = TimeLogForm(request.POST or None)     
-    
-        if timelog_form.is_valid():
-            new_timelog = timelog_form.save(commit=False)
-            new_timelog.activity = activity
-            new_timelog.save()    
-            messages.success(request, ("New log has been created!")) 
     
     #Chart data for Activity
     #---> adjusting chart time interval
@@ -175,37 +161,54 @@ def activity(request, activity_id):
     x_activity_data = [date for date in activity_chart_data.keys()]
     y_activity_data = [log for log in activity_chart_data.values()]
 
-    #---> chart configuration
+    activity_page_df = pd.Series(index=x_activity_data, data=y_activity_data, name=f"Activity {activity.name}").to_frame()
+    activity_page_df.index.name = "Dates"
+
+    activity.total_time = activity_page_df[f"Activity {activity.name}"].sum()
+    
+    # #---> chart configuration
     fig = px.line(
-        x = x_activity_data,
-        y = y_activity_data,
+        activity_page_df,
+        x=activity_page_df.index,
+        y=activity_page_df.columns,
         markers=True,
-        title=f"How is <b>{activity.name}</b> activity going",
+        line_shape="spline",
+        color_discrete_sequence = [activity.color],
+        title=f"Activity <b>{activity.name}</b> sum up",
         labels={
             'x': 'Date',
             'y': 'Time logged',
         },
     )
 
-    fig.update_layout(
-        title = {
-            'font_size': 22,
-            'xanchor': 'center',
-            'x': 0.5,
-        }
-    )
+    fig.update_traces(connectgaps=True)
+
+    fig.update_layout({
+        'plot_bgcolor': 'white',
+        'paper_bgcolor': 'white',
+        })
     
     activity_chart = fig.to_html()
+
+    #Create new time log
+    if request.method == 'POST':
+        timelog_form = TimeLogForm(request.POST or None)     
+    
+        if timelog_form.is_valid():
+            new_timelog = timelog_form.save(commit=False)
+            new_timelog.activity = activity
+            new_timelog.save()    
+            messages.success(request, ("New log has been created!")) 
     
     #Context
     context = {
         'activity': activity,
         'all_activity_logs': all_logs,
-        'time_summary_activity': time_summary_activity,
         'activity_chart': activity_chart,
         'chart_interval_form': chart_interval_form,
         'interval_start': interval_start,
-        'interval_end': interval_end, 
+        'interval_end': interval_end,
+        'activity_page_df': activity_page_df,
     }
 
     return render(request, 'app_tracker/activity.html', context)

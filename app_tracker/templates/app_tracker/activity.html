@@ -14,14 +14,14 @@
         <li>Strona nie działa jeżeli nie ma zadeklarowanych żadnych godzin.</li>
         <li>Dodać przycisk resetu przedziału czasowego.</li>
         <li>Dostosować wielkość wykresu</li>
-        <li>Uzależnić kolor wykresu od wybranego koloru aktywności.</li>
+        <li><strike>Uzależnić kolor wykresu od wybranego koloru aktywności.</strike></li>
         <li>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm:ss (24h).</li>
         <li>Dopracować wygląd wykresu.</li>
     </ol>
 
 
     <p><b>Category:</b> {{activity.category}}</p>
-    <p><b>Time summary:</b> {{time_summary_activity}}</p>
+    <p><b>Time summary:</b> {{activity.total_time}}</p>
     <p><b>Logs:</b></p>
     <form method="POST" action="">
         {% csrf_token %}

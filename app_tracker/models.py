@@ -10,7 +10,7 @@ COLOR_THEME_CHOICES = [
     ('orange', 'orange'),
     ('blue', 'blue'),
     ('green', 'green'),
-    ('pink', 'pink'),
+    ('black', 'black'),
 ]
 
 # Models

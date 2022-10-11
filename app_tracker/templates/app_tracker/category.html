@@ -12,7 +12,7 @@
     <p>{{category.description}}</p>
 
     <h3>All time:</h3>
-    {{category_total_time}}
+    {{category.total_time}}
 
     <h3>All category activities:</h3>
     {% if category_all_activities %}
@@ -29,8 +29,8 @@
                 <th scope='row'></th>
                 <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
                 <td>{{activity.color}}</td>
-                <td>activity total time</td>
-                <td>las log</td>
+                <td>{{activity.total_time}}</td>
+                <td>{{activity.last_log.date}} - {{activity.last_log.start_time}}</td>
             </tr>
             {% endfor %}
             <tr align='center' valign='middle'>
@@ -46,7 +46,7 @@
                             <option value="orange">orange</option>
                             <option value="blue">blue</option>
                             <option value="green">green</option>
-                            <option value="blue">pink</option>
+                            <option value="black">black</option>
                         </select>
                     </td>
                     <td colspan="2"><input type="submit" value="Create new activity"></td>            
@@ -61,15 +61,15 @@
     <p>Podsumowanie calej categorii:</p>
     <ol>
         <li><strike>Suma godzin ze wszystkich aktywnosci w categorii</strike></li>
-        <li>Wykres zbiorczy dla kazdej aktywnosci <strike>oraz dla calej categorii</strike> z uwzglednieniem wybranej wczesniej kolorystyki</li>
+        <li><strike>Wykres zbiorczy dla kazdej aktywnosci oraz dla calej categorii z uwzglednieniem wybranej wczesniej kolorystyki</strike></li>
         <li>Strona się wypierdala (przez wykres) gdy brak danych logowania</li>
     </ol>   
     --------------------------------------------<br>
     <p>Tabela zestawiająca wszystkie aktywności:</p>
     <ol>
-        <li>Suma spedzonych godzin na kazda aktywnosc</li>
+        <li><strike>Suma spedzonych godzin na kazda aktywnosc</strike></li>
         <li>Numeracja wierszy w kolumnie</li>
-        <li>Data ostatniego loga na dana aktywnosc</li>
+        <li><strike>Data ostatniego loga na dana aktywnosc.</strike></li>
         <li><strike>Link do podgladu poszczegolnej aktywnosci</strike></li>
         <li>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia</li>
         <li>Usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia
