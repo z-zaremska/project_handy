@@ -26,11 +26,11 @@
             </tr align='center' valign='middle'>
             {% for activity in category_all_activities %}
             <tr>
-                <th scope='row'></th>
+                <th scope='row'>x</th>
                 <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
                 <td>{{activity.color}}</td>
                 <td>{{activity.total_time}}</td>
-                <td>{{activity.last_log.date}} - {{activity.last_log.start_time}}</td>
+                <td>{{activity.last_log.date|date:'Y-m-d'}} - <i>{{activity.last_log.start_time|time:"H:i"}}</i></td>
             </tr>
             {% endfor %}
             <tr align='center' valign='middle'>

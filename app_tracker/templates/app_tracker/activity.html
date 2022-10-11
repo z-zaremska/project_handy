@@ -15,7 +15,7 @@
         <li>Dodać przycisk resetu przedziału czasowego.</li>
         <li>Dostosować wielkość wykresu</li>
         <li><strike>Uzależnić kolor wykresu od wybranego koloru aktywności.</strike></li>
-        <li>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm:ss (24h).</li>
+        <li><strike>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm (24h).</strike></li>
         <li>Dopracować wygląd wykresu.</li>
     </ol>
 
@@ -34,7 +34,7 @@
     <ol>
         {% if all_activity_logs %}
             {% for log in all_activity_logs %}
-                <li>{{log}} | {{log.start_time}} - <a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a> | <a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></li>
+                <li><b>{{log.date|date:'Y-m-d'}}</b> <i>{{log.start_time|time:"H:i"}}</i> - {{log.log_time}} - <a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a> | <a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></li>
             {% endfor %}
         {% endif %}
     </ol>
