@@ -9,6 +9,7 @@ from django.db.models import Sum, Q
 from collections import defaultdict
 import pandas as pd
 import plotly.express as px
+from django.core.exceptions import ObjectDoesNotExist
 
 # App home
 
@@ -27,6 +28,7 @@ def category(request, category_id):
     category = Category.objects.get(pk=category_id)
     category_all_activities = Activity.objects.filter(category=category).all()
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
+    
     colors = ['red']
     for activity in category_all_activities:
         colors.append(activity.color)
@@ -40,26 +42,16 @@ def category(request, category_id):
             new_activity.category = category
             new_activity.save()
             messages.success(request, "New activity has been created!")
+            return redirect('app_tracker:category', category.pk)
       
-    #Chart data for Category
-    #---> category chart data
-    category_logs_dates = [log.date for log in category_all_logs]
-    category_logs_time = [log.log_time for log in category_all_logs]    
-    
-    category_chart_data = defaultdict(timedelta)
-    for date, log in zip(category_logs_dates, category_logs_time):
-        if date in category_chart_data:
-            category_chart_data[date] += log
-        else:
-            category_chart_data[date] = log
- 
-    x_category_data = [date for date in category_chart_data.keys()]
-    y_category_data = [log for log in category_chart_data.values()]
+    #Category data frame
+    all_dates = []
+    for log in category_all_logs:
+        if log.date not in all_dates:
+            all_dates.append(log.date)
 
-    category_page_df = pd.Series(index=x_category_data, data=y_category_data, name=f'Category "{category.name}"').to_frame()
-    category_page_df.index.name = "Dates"
+    category_page_df = pd.Series(index=all_dates, data=pd.NaT, name=f'Category "{category.name}"').to_frame()
 
-    #---> activity chart data for Activity
     for activity in category_all_activities:
         activity_logs_dates = [log.date for log in TimeLog.objects.filter(activity=activity)]
         activity_logs_time = [log.log_time for log in TimeLog.objects.filter(activity=activity)]
@@ -73,17 +65,24 @@ def category(request, category_id):
         y_activity_data = [log for log in activity_chart_data.values()]
         activity_data = pd.Series(index=x_activity_data, data=y_activity_data)
         category_page_df[f'Activity "{activity.name}"'] = activity_data
+    
+    category_page_df.index.name = "Dates"
+    category_page_df = category_page_df.fillna(timedelta(0))
+    category_page_df[f'Category "{category.name}"'] = category_page_df.iloc[:, 1:].sum(axis=1)
+    print(category_page_df)
 
     #Total time for category and activity
     category.total_time = category_page_df[f'Category "{category.name}"'].sum()
     for activity in category_all_activities:
         activity.total_time = category_page_df[f'Activity "{activity.name}"'].sum()
-        activity.last_log = activity.all_logs.latest('date', 'start_time')
-   
+        try:
+            activity.last_log = activity.all_logs.latest('date', 'start_time')
+        except ObjectDoesNotExist:
+            pass
+  
+    #Category chart line
     fig = px.line(
         category_page_df,
-        x=category_page_df.index,
-        y=category_page_df.columns,
         markers=True,
         line_shape="spline",
         color_discrete_sequence = colors,
@@ -93,6 +92,7 @@ def category(request, category_id):
             'y': 'Time logged',
         },
     )
+
     fig.update_traces(connectgaps=True)
 
     fig.update_layout({
@@ -107,6 +107,7 @@ def category(request, category_id):
         'category': category,
         'category_all_activities': category_all_activities,
         'category_chart': category_chart,
+        'category_all_logs': category_all_logs,
     }
 
     return render(request, 'app_tracker/category.html', context)
@@ -163,14 +164,11 @@ def activity(request, activity_id):
 
     activity_page_df = pd.Series(index=x_activity_data, data=y_activity_data, name=f"Activity {activity.name}").to_frame()
     activity_page_df.index.name = "Dates"
-
     activity.total_time = activity_page_df[f"Activity {activity.name}"].sum()
     
     # #---> chart configuration
     fig = px.line(
         activity_page_df,
-        x=activity_page_df.index,
-        y=activity_page_df.columns,
         markers=True,
         line_shape="spline",
         color_discrete_sequence = [activity.color],
@@ -198,7 +196,8 @@ def activity(request, activity_id):
             new_timelog = timelog_form.save(commit=False)
             new_timelog.activity = activity
             new_timelog.save()    
-            messages.success(request, ("New log has been created!")) 
+            messages.success(request, ("New log has been created!"))
+            return redirect('app_tracker:activity', activity.pk)
     
     #Context
     context = {

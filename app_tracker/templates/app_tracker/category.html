@@ -15,60 +15,74 @@
     {{category.total_time}}
 
     <h3>All category activities:</h3>
-    {% if category_all_activities %}
-        <table border callpadding="10">
-            <tr align='center' valign='middle'>
-                <th>No.</th>
-                <th>Activity</th>
-                <th>Color</th>
-                <th>Total declared time</th>
-                <th>Last activity</th>
-            </tr align='center' valign='middle'>
+    <table border callpadding="10">
+        <tr align='center' valign='middle'>
+            <th>No.</th>
+            <th>Activity</th>
+            <th>Color</th>
+            <th>Total time</th>
+            <th>Last activity</th>
+        </tr align='center' valign='middle'>
+        {% if category_all_activities %}
             {% for activity in category_all_activities %}
             <tr>
-                <th scope='row'>x</th>
+                <th scope='row'>{{ forloop.counter }}</th>
                 <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
                 <td>{{activity.color}}</td>
-                <td>{{activity.total_time}}</td>
-                <td>{{activity.last_log.date|date:'Y-m-d'}} - <i>{{activity.last_log.start_time|time:"H:i"}}</i></td>
+                <td>
+                    {% if activity.total_time %}
+                        {{activity.total_time}}
+                    {% else %}
+                     -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if activity.last_log %}
+                        {{activity.last_log.date|date:'Y-m-d'}} - <i>{{activity.last_log.start_time|time:"H:i"}}</i>
+                    {% else %}
+                        <i>no activities yet</i>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
-            <tr align='center' valign='middle'>
-                <form method="POST">
-                    {% csrf_token %}
-                    <td>+</td>
-                    <td><input type="text" id="name" name="name"></td>
-                    <td>
-                        <select name="color" id="color"><br>
-                            <option value="gray">gray</option>
-                            <option value="yellow">yellow</option>
-                            <option value="purple">purple</option>
-                            <option value="orange">orange</option>
-                            <option value="blue">blue</option>
-                            <option value="green">green</option>
-                            <option value="black">black</option>
-                        </select>
-                    </td>
-                    <td colspan="2"><input type="submit" value="Create new activity"></td>            
-                </form>
-            </tr>
-        </table>
-    {% endif %}
+        {% endif %}                
+        <tr align='center' valign='middle'>
+            <form method="POST">
+                {% csrf_token %}
+                <th>+</th>
+                <td><input type="text" id="name" name="name"></td>
+                <td>
+                    <select name="color" id="color"><br>
+                        <option value="gray">gray</option>
+                        <option value="yellow">yellow</option>
+                        <option value="purple">purple</option>
+                        <option value="orange">orange</option>
+                        <option value="blue">blue</option>
+                        <option value="green">green</option>
+                        <option value="black">black</option>
+                    </select>
+                </td>
+                <td colspan="2"><input type="submit" value="Create new activity"></td>            
+            </form>
+        </tr>
+    </table>
 
-    {{category_chart|safe}}
+    {% if category_all_logs %}
+        {{category_chart|safe}}
+    {% endif %}
 
 
     <p>Podsumowanie calej categorii:</p>
     <ol>
         <li><strike>Suma godzin ze wszystkich aktywnosci w categorii</strike></li>
         <li><strike>Wykres zbiorczy dla kazdej aktywnosci oraz dla calej categorii z uwzglednieniem wybranej wczesniej kolorystyki</strike></li>
-        <li>Strona się wypierdala (przez wykres) gdy brak danych logowania</li>
+        <li><strike>Strona się wywala gdy brak danych logowania.</strike></li>
     </ol>   
     --------------------------------------------<br>
     <p>Tabela zestawiająca wszystkie aktywności:</p>
     <ol>
         <li><strike>Suma spedzonych godzin na kazda aktywnosc</strike></li>
-        <li>Numeracja wierszy w kolumnie</li>
+        <li><strike>Numeracja wierszy w kolumnie.</strike></li>
         <li><strike>Data ostatniego loga na dana aktywnosc.</strike></li>
         <li><strike>Link do podgladu poszczegolnej aktywnosci</strike></li>
         <li>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia</li>
