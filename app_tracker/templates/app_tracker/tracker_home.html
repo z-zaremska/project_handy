@@ -22,7 +22,7 @@
     ________
     <p>Panel użytkownika do appki.</p>
     <ol>
-        <li>Utworzenie nowej kategorii</li>
+        <li><strike>Utworzenie nowej kategorii.</strike></li>
         <li>Opcja logowania/wylogowania/rejestracji.</li>
         <li>Categorie widoczne tylko dla zalogowanego użytkownika.</li>
         <li>Brak możliwośći widoczności i edycji kategorii, aktywności i logów innych użytkowników.</li>
@@ -30,9 +30,16 @@
     </ol>
 
     <h3>Your categories</h3>
-    {% if categories %}
+    <form method="POST">
+        {% csrf_token %}
+        <label for="name">Name</label> <input name="name" id="name" type="text" placeholder="Category name"> |
+        <label for="description">Start</label> <input name="description" id="description" type="text" placeholder="Category description"> |
+        <input type="submit" value="Create new category!">
+    </form>
+
+    {% if all_categories %}
         <ol>
-        {% for category in categories %}
+        {% for category in all_categories %}
             <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
         {% endfor %}
         </ol>

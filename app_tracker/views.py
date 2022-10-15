@@ -1,26 +1,32 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.contrib import messages
 from app_tracker.models import Category, Activity, TimeLog
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
-from django.views.generic import TemplateView, DeleteView
-from datetime import timedelta
-from django.db.models import Sum, Q
 from collections import defaultdict
+from django.contrib import messages
+from datetime import timedelta
 import pandas as pd
 import plotly.express as px
 from django.core.exceptions import ObjectDoesNotExist
 
 # App home
 
-class TrackerHomeTemplateView(TemplateView):
-    template_name = 'app_tracker/tracker_home.html'
+def tracker_home(request):
+    all_categories = Category.objects.all()
 
-    def get_context_data(self, **kwargs):
-        context = super(TrackerHomeTemplateView, self).get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
-        return context
+    #Create new category
+    if request.method == 'POST':
+        category_form = CategoryForm(request.POST or None)     
+    
+        if category_form.is_valid():
+            category_form.save()  
+            messages.success(request, ("New category has been created!"))
+            return redirect('app_tracker:tracker_home')
 
+    context ={
+        'all_categories': all_categories,
+    }
+    
+    return render(request, 'app_tracker/tracker_home.html', context)
 
 #Category
 
@@ -33,7 +39,7 @@ def category(request, category_id):
     for activity in category_all_activities:
         colors.append(activity.color)
     
-    #create new Activity
+    #Create new Activity
     if request.method == "POST":
         activity_form = ActivityForm(request.POST or None)
 
@@ -112,9 +118,15 @@ def category(request, category_id):
 
     return render(request, 'app_tracker/category.html', context)
 
-class CategoryDeleteView(DeleteView):
-    model = Category
-    success_url = reverse_lazy(f"app_tracker:tracker_home")
+def category_delete(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    all_related_activities = Activity.objects.filter(category=category).all()
+
+    if request.method == 'POST':
+        category.delete()
+        return redirect('app_tracker:tracker_home')
+    
+    return render(request, 'app_tracker/category_confirm_delete.html', {'category': category, 'all_related_activities': all_related_activities})
 
 def category_edit(request, category_id):
     category = Category.objects.get(pk=category_id)
@@ -127,9 +139,7 @@ def category_edit(request, category_id):
             messages.success(request, ("Category has been updated!"))
             return redirect('app_tracker:category', category_id)
 
-    else:
-        return render(request, 'app_tracker/category_edit.html', {'category': category})
-
+    return render(request, 'app_tracker/category_edit.html', {'category': category})
 
 #Activity
 
@@ -212,24 +222,28 @@ def activity(request, activity_id):
 
     return render(request, 'app_tracker/activity.html', context)
 
-class ActivityDeleteView(DeleteView):
-    model = Activity
-    success_url = reverse_lazy(f"app_tracker:tracker_home")
+def activity_delete(request, activity_id):
+    activity = Activity.objects.get(pk=activity_id)
+    all_related_logs = TimeLog.objects.filter(activity=activity).all()
+    category_id = activity.category.pk
+
+    if request.method == 'POST':
+        activity.delete()
+        return redirect('app_tracker:category', category_id)
+    
+    return render(request, 'app_tracker/activity_confirm_delete.html', {'activity': activity, 'all_related_logs': all_related_logs})
 
 def activity_edit(request, activity_id):
     activity = Activity.objects.get(pk=activity_id)
 
     if request.method == 'POST':
         activity_form = ActivityForm(request.POST or None, instance=activity)
-
         if activity_form.is_valid():
             activity_form.save()
             messages.success(request, ("Activity has been updated!"))
-            return redirect('app_tracker:activity', activity_id)
+            return redirect('app_tracker:activity', activity.pk)
 
-    else:
-        return render(request, 'app_tracker/activity_edit.html', {'activity': activity})
-
+    return render(request, 'app_tracker/activity_edit.html', {'activity': activity})
 
 #TimeLog
 
@@ -246,12 +260,9 @@ def timelog_edit(request, timelog_id):
 
     if request.method == 'POST':
         timelog_form = TimeLogForm(request.POST or None, instance=timelog)
-        print(timelog_form.errors)
-
         if timelog_form.is_valid():
             timelog_form.save()
             messages.success(request, ("Time log has been updated!"))
             return redirect('app_tracker:activity', activity_id)
     
-    else:
-        return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog})
+    return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity_id,})

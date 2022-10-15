@@ -17,10 +17,12 @@
     </select>
     <br><br>
     <input type="submit" value="Save changes">
+    <a href="{% url 'app_tracker:activity' activity.id %}">Cancel</a>
 </form>
 
 <ol>
-    <li>Wywala strone przy nie uzupelnieniu calego formularza podczas edycji.</li>
+    <li><strike>Wywala strone przy nie uzupelnieniu calego formularza podczas edycji.</strike></li>
     <li>Zamiast osobnej strony mogloby sie pojawiac okienko edycji na stronie aktywności.</li>
+    <li><strike>Przycisk "cancel" jeżeli nie chcemy wprowadzać zmian.</strike></li>
 </ol>
 {% endblock content %}
