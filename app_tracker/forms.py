@@ -17,5 +17,5 @@ class TimeLogForm(forms.ModelForm):
         fields = ['date', 'log_time', 'start_time',]
 
 class ChartTimeIntervalForm(forms.Form):
-    interval_start = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'})) 
-    interval_end = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'})) 
+    adjust_interval_start = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'})) 
+    adjust_interval_end = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'})) 

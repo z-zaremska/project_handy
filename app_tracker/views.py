@@ -51,6 +51,27 @@ def category(request, category_id):
             return redirect('app_tracker:category', category.pk)
       
     #Category data frame
+    #---> adjusting chart time interval
+
+    adjust_interval_start = request.GET.get('adjust_interval_start')
+    adjust_interval_end = request.GET.get('adjust_interval_end')
+    chart_interval_form = ChartTimeIntervalForm()
+
+    if adjust_interval_start:
+        if adjust_interval_start == 'reset':
+            category_all_logs = category_all_logs            
+        else:
+            category_all_logs = category_all_logs.filter(date__gte=adjust_interval_start)
+    if adjust_interval_end:
+        if adjust_interval_end == 'reset':
+            category_all_logs = category_all_logs            
+        else:
+            category_all_logs = category_all_logs.filter(date__lte=adjust_interval_end)
+     
+    interval_start = category_all_logs.earliest('date', 'start_time').date
+    interval_end = category_all_logs.latest('date', 'start_time').date
+
+    #---> chart data
     all_dates = []
     for log in category_all_logs:
         if log.date not in all_dates:
@@ -114,19 +135,14 @@ def category(request, category_id):
         'category_all_activities': category_all_activities,
         'category_chart': category_chart,
         'category_all_logs': category_all_logs,
+        'adjust_interval_start': adjust_interval_start,
+        'adjust_interval_end': adjust_interval_end,
+        'interval_start': interval_start,
+        'interval_end': interval_end,
+        'chart_interval_form': chart_interval_form,
     }
 
     return render(request, 'app_tracker/category.html', context)
-
-def category_delete(request, category_id):
-    category = Category.objects.get(pk=category_id)
-    all_related_activities = Activity.objects.filter(category=category).all()
-
-    if request.method == 'POST':
-        category.delete()
-        return redirect('app_tracker:tracker_home')
-    
-    return render(request, 'app_tracker/category_confirm_delete.html', {'category': category, 'all_related_activities': all_related_activities})
 
 def category_edit(request, category_id):
     category = Category.objects.get(pk=category_id)
@@ -141,6 +157,16 @@ def category_edit(request, category_id):
 
     return render(request, 'app_tracker/category_edit.html', {'category': category})
 
+def category_delete(request, category_id):
+    category = Category.objects.get(pk=category_id)
+    all_related_activities = Activity.objects.filter(category=category).all()
+
+    if request.method == 'POST':
+        category.delete()
+        return redirect('app_tracker:tracker_home')
+    
+    return render(request, 'app_tracker/category_confirm_delete.html', {'category': category, 'all_related_activities': all_related_activities})
+
 #Activity
 
 def activity(request, activity_id):
@@ -149,15 +175,25 @@ def activity(request, activity_id):
     
     #Chart data for Activity
     #---> adjusting chart time interval
-    interval_start = request.GET.get('interval_start')
-    interval_end = request.GET.get('interval_end')
+
+    adjust_interval_start = request.GET.get('adjust_interval_start')
+    adjust_interval_end = request.GET.get('adjust_interval_end')
     chart_interval_form = ChartTimeIntervalForm()
 
-    if interval_start:
-        all_logs = all_logs.filter(date__gte=interval_start)
-    if interval_end:
-        all_logs = all_logs.filter(date__lte=interval_end)
+    if adjust_interval_start:
+        if adjust_interval_start == 'reset':
+            all_logs = all_logs            
+        else:
+            all_logs = all_logs.filter(date__gte=adjust_interval_start)
+    if adjust_interval_end:
+        if adjust_interval_end == 'reset':
+            all_logs = all_logs            
+        else:
+            all_logs = all_logs.filter(date__lte=adjust_interval_end)
      
+    interval_start = all_logs.earliest('date', 'start_time').date
+    interval_end = all_logs.latest('date', 'start_time').date
+    
     #---> chart data
     activity_logs_dates = [log.date for log in all_logs]
     activity_logs_time = [log.log_time for log in all_logs]
@@ -215,23 +251,14 @@ def activity(request, activity_id):
         'all_activity_logs': all_logs,
         'activity_chart': activity_chart,
         'chart_interval_form': chart_interval_form,
+        'adjust_interval_start': adjust_interval_start,
+        'adjust_interval_end': adjust_interval_end,
         'interval_start': interval_start,
         'interval_end': interval_end,
         'activity_page_df': activity_page_df,
     }
 
     return render(request, 'app_tracker/activity.html', context)
-
-def activity_delete(request, activity_id):
-    activity = Activity.objects.get(pk=activity_id)
-    all_related_logs = TimeLog.objects.filter(activity=activity).all()
-    category_id = activity.category.pk
-
-    if request.method == 'POST':
-        activity.delete()
-        return redirect('app_tracker:category', category_id)
-    
-    return render(request, 'app_tracker/activity_confirm_delete.html', {'activity': activity, 'all_related_logs': all_related_logs})
 
 def activity_edit(request, activity_id):
     activity = Activity.objects.get(pk=activity_id)
@@ -245,14 +272,18 @@ def activity_edit(request, activity_id):
 
     return render(request, 'app_tracker/activity_edit.html', {'activity': activity})
 
-#TimeLog
+def activity_delete(request, activity_id):
+    activity = Activity.objects.get(pk=activity_id)
+    all_related_logs = TimeLog.objects.filter(activity=activity).all()
+    category_id = activity.category.pk
 
-def timelog_delete(request, timelog_id):
-    timelog = TimeLog.objects.get(pk=timelog_id)
-    activity_id = timelog.activity.pk
-    timelog.delete()
-    messages.success(request, ('Time log has been deleted.'))
-    return redirect('app_tracker:activity', activity_id)
+    if request.method == 'POST':
+        activity.delete()
+        return redirect('app_tracker:category', category_id)
+    
+    return render(request, 'app_tracker/activity_confirm_delete.html', {'activity': activity, 'all_related_logs': all_related_logs})
+
+#TimeLog
 
 def timelog_edit(request, timelog_id):
     timelog = TimeLog.objects.get(pk=timelog_id)
@@ -266,3 +297,10 @@ def timelog_edit(request, timelog_id):
             return redirect('app_tracker:activity', activity_id)
     
     return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity_id,})
+
+def timelog_delete(request, timelog_id):
+    timelog = TimeLog.objects.get(pk=timelog_id)
+    activity_id = timelog.activity.pk
+    timelog.delete()
+    messages.success(request, ('Time log has been deleted.'))
+    return redirect('app_tracker:activity', activity_id)

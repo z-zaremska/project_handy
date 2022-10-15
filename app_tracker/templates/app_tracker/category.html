@@ -8,6 +8,25 @@
         <li><a href="{% url 'app_tracker:category_delete' category.id %}">Delete category</a>
     </ul>
 
+    {% if category_all_logs %}
+    {{category_chart|safe}}
+    <center>
+        <h4>({{interval_start}} - {{interval_end}})</h4>
+    </center>
+
+    <center>
+        <form method="GET" action="{% url 'app_tracker:category' category.id %}">
+            From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
+            <input type="submit" value="Set time interval">
+        </form>
+        <form method="GET" action="{% url 'app_tracker:category' category.id %}">
+            <input type="hidden" name="adjust_interval_start" value="reset">
+            <input type="hidden" name="adjust_interval_end" value="reset">
+            <input type="submit" value="Reset">
+        </form>
+    </center>
+    {% endif %}
+    
     <h2>Description</h2>
     <p>{{category.description}}</p>
 
@@ -28,7 +47,7 @@
             <tr>
                 <th scope='row'>{{ forloop.counter }}</th>
                 <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
-                <td>{{activity.color}}</td>
+                <td style="color:{{activity.color}}">{{activity.color}}</td>
                 <td>
                     {% if activity.total_time %}
                         {{activity.total_time}}
@@ -67,11 +86,6 @@
         </tr>
     </table>
 
-    {% if category_all_logs %}
-        {{category_chart|safe}}
-    {% endif %}
-
-
     <p>Podsumowanie calej categorii:</p>
     <ol>
         <li><strike>Suma godzin ze wszystkich aktywnosci w categorii</strike></li>
@@ -81,11 +95,11 @@
     --------------------------------------------<br>
     <p>Tabela zestawiająca wszystkie aktywności:</p>
     <ol>
-        <li><strike>Suma spedzonych godzin na kazda aktywnosc</strike></li>
+        <li><strike>Suma spedzonych godzin na kazda aktywność.</strike></li>
         <li><strike>Numeracja wierszy w kolumnie.</strike></li>
         <li><strike>Data ostatniego loga na dana aktywnosc.</strike></li>
-        <li><strike>Link do podgladu poszczegolnej aktywnosci</strike></li>
-        <li>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia</li>
+        <li><strike>Link do podgladu poszczegolnej aktywnosci.</strike></li>
+        <li><strike>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia.</strike></li>
         <li><strike>Usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia.</strike></li>
             </ol>
         </li>

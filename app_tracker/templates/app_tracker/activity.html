@@ -9,10 +9,30 @@
     </ul>
 
     <h2>Details</h2>
+    {% if all_activity_logs %}
+        {{ activity_chart|safe }}
+        <center>
+            <h4>({{interval_start}} - {{interval_end}})</h4>
+        </center>
+
+        <center>
+            <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
+                From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
+                <input type="submit" value="Set time interval">
+            </form>
+            <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
+                <input type="hidden" name="adjust_interval_start" value="reset">
+                <input type="hidden" name="adjust_interval_end" value="reset">
+                <input type="submit" value="Reset">
+            </form>
+        </center>
+    {% endif %}
+
+
     <ol>
-        <li>Ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano).</li>
+        <li><strike>Ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano).</strike></li>
         <li><strike>Strona nie działa jeżeli nie ma zadeklarowanych żadnych godzin.</strike></li>
-        <li>Dodać przycisk resetu przedziału czasowego.</li>
+        <li><strike>Dodać przycisk resetu przedziału czasowego.</strike></li>
         <li>Dostosować wielkość wykresu</li>
         <li><strike>Uzależnić kolor wykresu od wybranego koloru aktywności.</strike></li>
         <li><strike>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm (24h).</strike></li>
@@ -22,38 +42,37 @@
 
     <p><b>Category:</b> {{activity.category}}</p>
     <p><b>Time summary:</b> {{activity.total_time}}</p>
-    <p><b>Logs:</b></p>
-    <form method="POST">
-        {% csrf_token %}
-        <label for="date">Date</label><input name="date" id="date" type="date"> |
-        <label for="start_time">Start</label><input name="start_time" id="start_time" type="time"> |
-        <label for="log_time">Time to log</label><input name="log_time" id="log_time" step="2" type="time"> |
-        <input type="submit" value="Log time">
-    </form>
-    
-    <ol>
+    <p><b>Logs:</b></p>    
+    <table border callpadding="10">
+        <tr align='center' valign='middle'>
+            <th>No.</th>
+            <th>Date</th>
+            <th>Start time</th>
+            <th>Logged time</th>
+            <th colspan="2">Action</th>
+        </tr align='center' valign='middle'>
         {% if all_activity_logs %}
             {% for log in all_activity_logs %}
-                <li><b>{{log.date|date:'Y-m-d'}}</b> <i>{{log.start_time|time:"H:i"}}</i> - {{log.log_time}} - <a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a> | <a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></li>
+            <tr>
+                <th scope='row'>{{ forloop.counter }}</th>
+                <td>{{log.date|date:'Y-m-d'}}</td>
+                <td>{{log.start_time|time:"H:i"}}</td>
+                <td>{{log.log_time}}</td>
+                <td><a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a></td>
+                <td><a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></td>
+            </tr>
             {% endfor %}
-        {% endif %}
-    </ol>
-    
-    {% comment %} Chart (date x time log) {% endcomment %}
-    {% if all_activity_logs %}
-        {{ activity_chart|safe }}
-        <center>
-            <h4>({{interval_start}} - {{interval_end}} )</h4>
-        </center>
-    {% endif %}
-
-
-    <center>
-        <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
-            From {{chart_interval_form.interval_start}} to {{chart_interval_form.interval_end}}
-            <input type="submit" value="Set time interval">
-            <br><br>
-        </form>
-    </center>
+        {% endif %}                
+        <tr align='center' valign='middle'>
+            <form method="POST">
+                {% csrf_token %}
+                <th>+</th>
+                <td><input name="date" id="date" type="date">
+                <td><input name="start_time" id="start_time" type="time"></td>
+                <td><input name="log_time" id="log_time" step="2" type="time"></td>
+                <td colspan="2"><input type="submit" value="New time log"></td>            
+            </form>
+        </tr>
+    </table>
 
 {% endblock content %}
