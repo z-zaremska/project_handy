@@ -9,31 +9,29 @@
     </ul>
 
     {% if category_all_logs %}
-    {{category_chart|safe}}
-    <center>
-        <h4>({{interval_start}} - {{interval_end}})</h4>
-    </center>
+        <center>    
+            {{category_chart|safe}}
+            <h4>({{interval_start}} - {{interval_end}})</h4>
+        </center>
 
-    <center>
-        <form method="GET" action="{% url 'app_tracker:category' category.id %}">
-            From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
-            <input type="submit" value="Set time interval">
-        </form>
-        <form method="GET" action="{% url 'app_tracker:category' category.id %}">
-            <input type="hidden" name="adjust_interval_start" value="reset">
-            <input type="hidden" name="adjust_interval_end" value="reset">
-            <input type="submit" value="Reset">
-        </form>
-    </center>
+        <center>
+            <form method="GET" action="{% url 'app_tracker:category' category.id %}">
+                From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
+                <input type="submit" value="Set time interval">
+            </form>
+            <form method="GET" action="{% url 'app_tracker:category' category.id %}">
+                <input type="hidden" name="adjust_interval_start" value="reset">
+                <input type="hidden" name="adjust_interval_end" value="reset">
+                <input type="submit" value="Reset">
+            </form>
+        </center>
     {% endif %}
     
-    <h2>Description</h2>
-    <p>{{category.description}}</p>
+    <p><b>Description:</b> {{category.description}}</p>
 
-    <h3>All time:</h3>
-    {{category.total_time}}
+    <p><b>All time:</b> {{category.total_time}}</p>
 
-    <h3>All category activities:</h3>
+    <b>All category activities:</b>
     <table border callpadding="10">
         <tr align='center' valign='middle'>
             <th>No.</th>
@@ -85,24 +83,5 @@
             </form>
         </tr>
     </table>
-
-    <p>Podsumowanie calej categorii:</p>
-    <ol>
-        <li><strike>Suma godzin ze wszystkich aktywnosci w categorii</strike></li>
-        <li><strike>Wykres zbiorczy dla kazdej aktywnosci oraz dla calej categorii z uwzglednieniem wybranej wczesniej kolorystyki</strike></li>
-        <li><strike>Strona się wywala gdy brak danych logowania.</strike></li>
-    </ol>   
-    --------------------------------------------<br>
-    <p>Tabela zestawiająca wszystkie aktywności:</p>
-    <ol>
-        <li><strike>Suma spedzonych godzin na kazda aktywność.</strike></li>
-        <li><strike>Numeracja wierszy w kolumnie.</strike></li>
-        <li><strike>Data ostatniego loga na dana aktywnosc.</strike></li>
-        <li><strike>Link do podgladu poszczegolnej aktywnosci.</strike></li>
-        <li><strike>Wiersz w tabeli oraz wykres uwglednia kolor wybranej aktywnosci podczas jej tworzenia.</strike></li>
-        <li><strike>Usuniecie aktywnosci >>> link do strony pozwalajacej na wybor usuniecia.</strike></li>
-            </ol>
-        </li>
-    </ol>
 
 {% endblock content %}

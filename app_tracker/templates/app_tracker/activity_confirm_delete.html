@@ -1,26 +1,20 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>Are you sure you want delete <b>{{activity.name}}</b> activity with all connected ({{all_related_logs.count}}) logs?</p>
+    <p>Are you sure you want delete <b>{{activity.name}}</b> activity with all connected ({{all_related_logs.count}}) logs?</p>
 
-{% if all_related_logs %}
-    <ol>
-    {% for log in all_related_logs %}
-        <li>{{log}}</li>
-    {% endfor %}
-    </ol>
-{% endif %}
+    {% if all_related_logs %}
+        <ol>
+        {% for log in all_related_logs %}
+            <li>{{log}}</li>
+        {% endfor %}
+        </ol>
+    {% endif %}
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="submit" value="Delete activity">
-    <a href="{% url 'app_tracker:activity' activity.id %}">Cancel</a>
-</form>
-
-<ol>
-    <li><strike>Wyświetlić wszystkie powiązanie logi.</strike></li>
-    <li><strike>Wyświetlić ilość logów.</strike></li>
-    <li><strike>Powrót do powiązaniej kategorii (nie do strony głównej aplikacji).</strike></li>
-</ol>
+    <form method="POST">
+        {% csrf_token %}
+        <input type="submit" value="Delete activity">
+        <a href="{% url 'app_tracker:activity' activity.id %}">Cancel</a>
+    </form>
 
 {% endblock content %}

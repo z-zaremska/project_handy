@@ -106,28 +106,40 @@ def category(request, category_id):
             activity.last_log = activity.all_logs.latest('date', 'start_time')
         except ObjectDoesNotExist:
             pass
-  
-    #Category chart line
+
+    #Category chart - line
     fig = px.line(
         category_page_df,
         markers=True,
         line_shape="spline",
         color_discrete_sequence = colors,
-        title=f"Category <b>{category.name}</b> sum up",
-        labels={
-            'x': 'Date',
-            'y': 'Time logged',
-        },
+        title=None,
     )
 
-    fig.update_traces(connectgaps=True)
+    fig.update_traces(
+        connectgaps=True,
+        line=dict(dash='dash', width=4), selector = ({'name': f'Category "{category.name}"'}),
+        )
 
-    fig.update_layout({
-        'plot_bgcolor': 'white',
-        'paper_bgcolor': 'white',
-        })
-
-    category_chart = fig.to_html()
+    fig.update_layout(
+        xaxis=dict(title="Date",showgrid=True, gridwidth=1, gridcolor='Lightgray'),
+        yaxis=dict(title="Time logged", showgrid=True, gridwidth=1, gridcolor='Lightgray',),
+        margin=dict(l=0, r=0, b=0, t=0),
+        autosize=True,
+        height=400,
+        plot_bgcolor='white',
+        hovermode=False,
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01,
+            bordercolor='black',
+            borderwidth=2,
+            title={'text': None})
+        )
+   
+    category_chart = fig.to_html(config = {'displayModeBar': False},)
     
     #Context
     context = {
@@ -218,21 +230,23 @@ def activity(request, activity_id):
         markers=True,
         line_shape="spline",
         color_discrete_sequence = [activity.color],
-        title=f"Activity <b>{activity.name}</b> sum up",
-        labels={
-            'x': 'Date',
-            'y': 'Time logged',
-        },
+        title=None,
     )
 
     fig.update_traces(connectgaps=True)
 
-    fig.update_layout({
-        'plot_bgcolor': 'white',
-        'paper_bgcolor': 'white',
-        })
+    fig.update_layout(
+        xaxis=dict(title="Date",showgrid=True, gridwidth=1, gridcolor='Lightgray'),
+        yaxis=dict(title="Time logged", showgrid=True, gridwidth=1, gridcolor='Lightgray',),
+        margin=dict(l=0, r=0, b=0, t=0),
+        autosize=True,
+        height=400,
+        plot_bgcolor='white',
+        hovermode=False,
+        showlegend=False,
+    )
     
-    activity_chart = fig.to_html()
+    activity_chart = fig.to_html(config = {'displayModeBar': False},)
 
     #Create new time log
     if request.method == 'POST':

@@ -27,19 +27,6 @@
             </form>
         </center>
     {% endif %}
-
-
-    <ol>
-        <li><strike>Ustawić wyświetlanie wartości domyślnych przedzialu czasowego (lub nie wyswietalnie jezeli nie podano).</strike></li>
-        <li><strike>Strona nie działa jeżeli nie ma zadeklarowanych żadnych godzin.</strike></li>
-        <li><strike>Dodać przycisk resetu przedziału czasowego.</strike></li>
-        <li>Dostosować wielkość wykresu</li>
-        <li><strike>Uzależnić kolor wykresu od wybranego koloru aktywności.</strike></li>
-        <li><strike>Dostosować wyświetlanie czasu - YYYY:MM:DD, HH:mm (24h).</strike></li>
-        <li>Dopracować wygląd wykresu.</li>
-    </ol>
-
-
     <p><b>Category:</b> {{activity.category}}</p>
     <p><b>Time summary:</b> {{activity.total_time}}</p>
     <p><b>Logs:</b></p>    
@@ -50,19 +37,7 @@
             <th>Start time</th>
             <th>Logged time</th>
             <th colspan="2">Action</th>
-        </tr align='center' valign='middle'>
-        {% if all_activity_logs %}
-            {% for log in all_activity_logs %}
-            <tr>
-                <th scope='row'>{{ forloop.counter }}</th>
-                <td>{{log.date|date:'Y-m-d'}}</td>
-                <td>{{log.start_time|time:"H:i"}}</td>
-                <td>{{log.log_time}}</td>
-                <td><a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a></td>
-                <td><a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></td>
-            </tr>
-            {% endfor %}
-        {% endif %}                
+        </tr>
         <tr align='center' valign='middle'>
             <form method="POST">
                 {% csrf_token %}
@@ -73,6 +48,18 @@
                 <td colspan="2"><input type="submit" value="New time log"></td>            
             </form>
         </tr>
+        {% if all_activity_logs %}
+            {% for log in all_activity_logs %}
+            <tr align='center' valign='middle'>
+                <th scope='row'>{{ forloop.counter }}</th>
+                <td>{{log.date|date:'Y-m-d'}}</td>
+                <td>{{log.start_time|time:"H:i"}}</td>
+                <td>{{log.log_time}}</td>
+                <td><a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a></td>
+                <td><a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></td>
+            </tr>
+            {% endfor %}
+        {% endif %}
     </table>
 
 {% endblock content %}

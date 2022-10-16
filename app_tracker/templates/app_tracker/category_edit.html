@@ -2,17 +2,13 @@
 
 {% block content %}
 
-<form method="POST" action="">
-    {% csrf_token %}
-    <label for="name">Name</label><input name="name" id="name" type="text" value="{{ category.name }}"><br>
-    <label for="description">Description</label><input name="description" id="description" type="text" value="{{ category.description }}"><br>
-    <br><br>
-    <input type="submit" value="Save changes">
-    <a href="{% url 'app_tracker:category' category.id %}">Cancel</a>
-</form>
+    <form method="POST" action="">
+        {% csrf_token %}
+        <label for="name">Name</label><input name="name" id="name" type="text" value="{{ category.name }}"><br>
+        <label for="description">Description</label><input name="description" id="description" type="text" value="{{ category.description }}"><br>
+        <br><br>
+        <input type="submit" value="Save changes">
+        <a href="{% url 'app_tracker:category' category.id %}">Cancel</a>
+    </form>
 
-<ol>
-    <li><strike>Wywala strone przy nie uzupelnieniu calego formularza podczas edycji.</strike></li>
-    <li>Zamiast osobnej strony mogloby sie pojawiac okienko edycji na stronie aktywności.</li>
-</ol>
 {% endblock content %}
