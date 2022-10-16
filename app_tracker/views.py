@@ -203,8 +203,12 @@ def activity(request, activity_id):
         else:
             all_logs = all_logs.filter(date__lte=adjust_interval_end)
      
-    interval_start = all_logs.earliest('date', 'start_time').date
-    interval_end = all_logs.latest('date', 'start_time').date
+    try:
+        interval_start = all_logs.earliest('date', 'start_time').date
+        interval_end = all_logs.latest('date', 'start_time').date
+    except ObjectDoesNotExist:
+        interval_start = None
+        interval_end = None
     
     #---> chart data
     activity_logs_dates = [log.date for log in all_logs]
