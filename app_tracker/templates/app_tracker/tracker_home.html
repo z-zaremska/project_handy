@@ -1,38 +1,72 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
 
 {% block content %}
 
-    <h1>Tracker app</h1>
+<div class="col-lg-8 mx-auto p-4 py-md-5">
+    <h1><svg class="bi me-2" width="45" height="45"><use xlink:href="#speedometer2"/></svg> Activity tracker (<i>logout</i>)</h1>
+    <p class="fs-5 col-md-8">Activity tracker app allows you to track time spent on any activity you want. By auto-responsive charts you can analize your progress and assumptions during the process.</p>
 
-    <h2>What does it do?</h2>
-    <p>Opis do czego służy appka</p>
+    <div class="mb-5">
+      <a href="/docs/5.2/examples/" class="btn btn-primary btn-lg px-4">Start now!</a>
+    </div>
 
-    <h2>Technology</h2>
-    <p>Opis wykorzystanych technologii</p>
-    <ol>
-        <li>django</li>
-        <li>python</li>
-        <li>pandas</li>
-        <li>plotly</li>
-        <li>numpy</li>
-        <li>bootstrap</li>
-    </ol>
+    <div class="row g-2">
+        <div class="col-md-4">
+            <h4>Your categories (<i>login</i>)</h4>
+            {% if all_categories %}
+            <ol>
+            {% for category in all_categories %}
+                <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
+            {% endfor %}
+            </ol>
+        {% endif %}
+        </div>
+  
+        <div class="col-md-4">
+            <h4>New category (<i>login</i>)</h4>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="name">Name</label><br>
+                <input name="name" id="name" type="text" placeholder="Category name"><br>
+                <label for="description">Description</label><br>
+                <input name="description" id="description" type="text" placeholder="Category description"><br><br>
+                <input type="submit" value="Create new category!">
+            </form>
+        </form>
+        </div>
+      </div>
 
-    <h3>Your categories</h3>
-    <form method="POST">
-        {% csrf_token %}
-        <label for="name">Name</label> <input name="name" id="name" type="text" placeholder="Category name"> |
-        <label for="description">Start</label> <input name="description" id="description" type="text" placeholder="Category description"> |
-        <input type="submit" value="Create new category!">
-    </form>
+    <hr class="col-3 col-md-2 mb-5">
 
-    {% if all_categories %}
-        <ol>
-        {% for category in all_categories %}
-            <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
-        {% endfor %}
-        </ol>
-    {% endif %}
+    <div class="row g-5">
+
+        <div class="col-md-6">
+            <h5>Living example (<i>logout</i>)</h5>
+            <p>Here you can see the real example of using the tracker app by me during my programming learning process.</p>
+            <h6>My very own categories</h6>
+            <ul class="icon-list ps-0">
+            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
+            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
+            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
+            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
+            </ul>
+        </div>
+
+        <div class="col-md-6">
+        <h5>Used technology (<i>logout</i>)</h5>
+            <ol>
+                <li>django</li>
+                <li>python</li>
+                <li>pandas</li>
+                <li>plotly</li>
+                <li>numpy</li>
+                <li>bootstrap</li>
+            </ol>
+        </div>
+
+    </div>
+  
+</div>
 
 {% endblock content %}
