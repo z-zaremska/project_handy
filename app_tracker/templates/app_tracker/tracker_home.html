@@ -1,72 +1,114 @@
 {% extends 'base.html' %}
 
+{% block navbar %}
+
+    <a href="{% url 'project_home' %}" class="d-inline-flex align-items-center disabled"></a>
+    <p class="text-align-middle my-auto me-1">| Activity tracker</p>   
+    </a>
+
+{% endblock navbar %}
+
 
 {% block content %}
 
-<div class="col-lg-8 mx-auto p-4 py-md-5">
-    <h1><svg class="bi me-2" width="45" height="45"><use xlink:href="#speedometer2"/></svg> Activity tracker (<i>logout</i>)</h1>
-    <p class="fs-5 col-md-8">Activity tracker app allows you to track time spent on any activity you want. By auto-responsive charts you can analize your progress and assumptions during the process.</p>
 
-    <div class="mb-5">
-      <a href="/docs/5.2/examples/" class="btn btn-primary btn-lg px-4">Start now!</a>
-    </div>
-
-    <div class="row g-2">
-        <div class="col-md-4">
-            <h4>Your categories (<i>login</i>)</h4>
+<div class="col-lg-6 mx-auto p-1 py-md-4">
+    <!-- Logged in -->
+    <div class="mb-3 text-center">
+        <div class="col-md">
+            <h4 class="display-6">Your categories (<i>login</i>)</h4>
             {% if all_categories %}
-            <ol>
-            {% for category in all_categories %}
-                <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
-            {% endfor %}
-            </ol>
-        {% endif %}
+                <ul class="list-unstyled">
+                {% for category in all_categories %}
+                    <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+
+
+            <!-- Button - trigger modal -->
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Create new
+            </button>
+            <hr>
+            
+            <!-- Modal - Create new category -->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Create new category</h1>
+                        </div>
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="modal-body col-10 align-self-center">
+                                <div class="input-group input-group-sm flex-nowrap mb-2">
+                                    <span class="input-group-text" id="addon-wrapping">Name</span>
+                                    <input type="text" name="name" class="form-control" placeholder="e.g. running" aria-label="Name" aria-describedby="addon-wrapping">
+                                </div>
+                                <div class="input-group input-group-sm flex-nowrap mb-2">
+                                    <span class="input-group-text" id="addon-wrapping">Description</span>
+                                    <input type="text" name="description" class="form-control" placeholder="e.g. all running exercises" aria-label="Description" aria-describedby="addon-wrapping">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                <input type="submit" class="btn btn-success btn-sm" value="Save">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-  
-        <div class="col-md-4">
-            <h4>New category (<i>login</i>)</h4>
-            <form method="POST">
-                {% csrf_token %}
-                <label for="name">Name</label><br>
-                <input name="name" id="name" type="text" placeholder="Category name"><br>
-                <label for="description">Description</label><br>
-                <input name="description" id="description" type="text" placeholder="Category description"><br><br>
-                <input type="submit" value="Create new category!">
-            </form>
-        </form>
-        </div>
-      </div>
-
-    <hr class="col-3 col-md-2 mb-5">
-
-    <div class="row g-5">
-
-        <div class="col-md-6">
-            <h5>Living example (<i>logout</i>)</h5>
-            <p>Here you can see the real example of using the tracker app by me during my programming learning process.</p>
-            <h6>My very own categories</h6>
-            <ul class="icon-list ps-0">
-            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
-            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
-            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
-            <li class="d-flex align-items-start mb-1"><a href="">link</a></li>
-            </ul>
-        </div>
-
-        <div class="col-md-6">
-        <h5>Used technology (<i>logout</i>)</h5>
-            <ol>
-                <li>django</li>
-                <li>python</li>
-                <li>pandas</li>
-                <li>plotly</li>
-                <li>numpy</li>
-                <li>bootstrap</li>
-            </ol>
-        </div>
-
     </div>
-  
+
+
+    <!-- Logged out -->
+    <div>
+        <!-- App details -->
+        <div class="card">
+            <h5 class="card-header text-center bg-dark text-white display-6"><svg class="bi me-2" width="45" height="45"><use xlink:href="#speedometer2"/></svg>Activity tracker (<i>logout</i>)</h5>
+            <div class="card-body text-center">
+            <p class="card-text">Activity tracker app allows you to track time spent on any activity you want. By auto-responsive charts you can analize your progress and assumptions during the process.</p>
+            <div class="text-center">
+                <a href="#" class="btn btn-dark">Start now!</a>
+            </div>
+            </div>
+        </div>
+
+        <div class="row align-items-md-stretch mt-4">
+            <!-- Example section -->
+            <div class="col-md">
+                <div class=" h-100 p-3 text-bg-primary rounded-3">
+                    <h5>Example of use (logout)</h5>
+                    <hr>
+                    <p>
+                        Here you can see some real example of using the tracker app by me during my programming learning process.
+                        <ul class="icon-list ps-0">
+                            <li class="d-flex align-items-start mb-1"><a href="" class="text-white">link</a></li>
+                            <li class="d-flex align-items-start mb-1"><a href="" class="text-white">link</a></li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+            <!-- Technology section -->
+            <div class="col-md">
+                <div class="h-100 p-3 bg-warning border rounded-3">
+                    <h5>Used technology (logout)</h5>
+                    <hr>
+                    <ol>
+                        <li>django</li>
+                        <li>python</li>
+                        <li>pandas</li>
+                        <li>plotly</li>
+                        <li>numpy</li>
+                        <li>bootstrap</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 {% endblock content %}

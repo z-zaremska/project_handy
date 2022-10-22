@@ -110,67 +110,77 @@
 
         <header>
             <div class="px-3 py-2 text-bg-dark">
-              <div class="container">
-                <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                  <a href="{% url 'project_home' %}" class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
-                    <svg class="bi me-2" width="40" height="40" role="img" aria-label="Bootstrap"><use xlink:href="#journal-code"/></svg>Project handy
-                  </a>        
-                  <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-                    <li>
-                      <a href="{% url 'project_home' %}" class="nav-link text-white">
-                        <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#home"/></svg>
-                        Home
-                      </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'about_me' %}" class="nav-link text-white">
-                        <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#star"/></svg>
-                        About me
-                      </a>
-                    </li>
-                    <li>
-                        <div class="dropdown">
-                            <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#grid"/></svg>
-                                Apps
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'app_tracker:tracker_home' %}">
-                                        <svg class="bi me-2" width="20" height="20"><use xlink:href="#speedometer2"></svg>
-                                        Activity tracker
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="#">
-                                        <svg class="bi me-2" width="20" height="20"><use xlink:href="#cloud-sun"></svg>
-                                        Weather
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" align='center' href="#">
-                                        <svg class="bi me-2" width="20" height="20"><use xlink:href="#list-task"></svg>
-                                        To-do list
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
-                    <li>
-                      <a href="#" class="nav-link text-white">
-                        <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#people-circle"/></svg>
-                        Log in
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                <!-- Site navigation -->
+                <div class="container d-flex justify-content-between">
+                  <!-- Beradcrump section - left -->
+                  <div class="d-inline-flex justify-content-start my-auto">
+                          <a href="{% url 'project_home' %}" class="d-inline-flex align-items-center nav-link">
+                            <svg class="bi me-1" width="40" height="40"><use xlink:href="#journal-code"></svg>
+                            <h6 class="text-align-middle my-auto me-1">Project Handy</h6>
+                          </a>
+                          {% block navbar %}
+                          {% endblock navbar %}
+                  </div>                     
+                  <!-- Navbar - right -->
+                  <div class="justify-content-end">
+                    <ul class="nav col-12 col-lg-auto my-2 align-self-end my-md-0 text-small">
+                      <li>
+                        <a href="{% url 'project_home' %}" class="nav-link text-white">
+                          <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#home"/></svg>
+                          Home
+                        </a>
+                      </li>
+                      <li>
+                          <a href="{% url 'about_me' %}" class="nav-link text-white">
+                          <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#star"/></svg>
+                          About me
+                        </a>
+                      </li>
+                      <li>
+                          <div class="dropdown">
+                              <a class="nav-link text-white dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#grid"/></svg>
+                                  Apps
+                              </a>
+                              <ul class="dropdown-menu">
+                                  <li><a class="dropdown-item" href="{% url 'app_tracker:tracker_home' %}">
+                                          <svg class="bi me-2" width="20" height="20"><use xlink:href="#speedometer2"></svg>
+                                          Activity tracker
+                                      </a>
+                                  </li>
+                                  <li>
+                                      <a class="dropdown-item disabled" href="#">
+                                          <svg class="bi me-2" width="20" height="20"><use xlink:href="#cloud-sun"></svg>
+                                          Weather
+                                      </a>
+                                  </li>
+                                  <li>
+                                      <a class="dropdown-item disabled" href="#">
+                                          <svg class="bi me-2" width="20" height="20"><use xlink:href="#list-task"></svg>
+                                          To-do list
+                                      </a>
+                                  </li>
+                              </ul>
+                          </div>
+                      </li>
+                      <li>
+                        <a href="#" class="nav-link text-white">
+                          <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#people-circle"/></svg>
+                          Log in
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
               </div>
             </div>
         </header>
         
         <main>
-          {% block content %}
+          <div class="container d-flex justify-content-center">
+            {% block content %}
 
-          {% endblock content %}
+            {% endblock content %}
+          </div>
         </main>
 
         <script src="{% static 'bootstrap/js/bootstrap.js' %}"></script>
