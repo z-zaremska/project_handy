@@ -191,7 +191,6 @@ def activity(request, activity_id):
     
     #Chart data for Activity
     #---> adjusting chart time interval
-
     adjust_interval_start = request.GET.get('adjust_interval_start')
     adjust_interval_end = request.GET.get('adjust_interval_end')
     chart_interval_form = ChartTimeIntervalForm()

@@ -1,20 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p>Are you sure you want delete <b>{{category.name}}</b> category with all connected activities ({{all_related_activities.count}})?</p>
-
-    {% if all_related_activities %}
-        <ol>
-        {% for activity in all_related_activities %}
-            <li>{{activity}}</li>
-        {% endfor %}
-        </ol>
-    {% endif %}
-
-    <form method="POST">
-        {% csrf_token %}
-        <input type="submit" value="Delete category">
-        <a href="{% url 'app_tracker:category' category.id %}">Cancel</a>
-    </form>
-
+<div class="col-6 d-flex justify-content-center mt-3">
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Are you sure?</h4>
+        <p>With "delete" button you will remove permanently category <b>{{category.name}}</b> with all ({{all_related_activities.count}}) related activities!</p>
+        <hr>
+        {% if all_related_activities %}
+            <ol>
+            {% for activity in all_related_activities %}
+                <li>{{activity}}</li>
+            {% endfor %}
+            </ol>
+        {% endif %}
+        <div class="d-inline-flex justify-content-end">
+            <form method="POST">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Delete category">
+                <a href="{% url 'app_tracker:category' category.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock content %}
