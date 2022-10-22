@@ -1,87 +1,184 @@
 {% extends 'base.html' %}
 
+
+{% block navbar %}
+<!-- Link tree -->
+<a href="{% url 'app_tracker:tracker_home' %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">
+    | Activity tracker
+</a>
+<!-- Recent page -->
+<a href="{% url 'app_tracker:category' category.id %}" class="d-inline-flex align-items-center disabled"></a>
+    <p class="text-align-middle my-auto me-1">| {{category.name}}</p>   
+</a>
+
+{% endblock navbar %}
+
+
 {% block content %}
+<div class="col-lg mx-auto p-1 py-md-4 justify-content-center">
 
-    <h1>Category: <i>{{category.name}}</i></h1>
-    <ul>
-        <li><a href="{% url 'app_tracker:category_edit' category.id %}">Edit category</a>
-        <li><a href="{% url 'app_tracker:category_delete' category.id %}">Delete category</a>
-    </ul>
+    <!-- Category description + chart -->
+    <div class="row">
 
-    {% if category_all_logs %}
-        <center>    
-            {{category_chart|safe}}
-            <h4>({{interval_start}} - {{interval_end}})</h4>
-        </center>
+        <!-- Left side-->
+        <div class="col-3">
 
-        <center>
-            <form method="GET" action="{% url 'app_tracker:category' category.id %}">
-                From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
-                <input type="submit" value="Set time interval">
-            </form>
-            <form method="GET" action="{% url 'app_tracker:category' category.id %}">
-                <input type="hidden" name="adjust_interval_start" value="reset">
-                <input type="hidden" name="adjust_interval_end" value="reset">
-                <input type="submit" value="Reset">
-            </form>
-        </center>
-    {% endif %}
+            <!-- Category details -->
+            <div class="card" style="width: 17rem;">
+                <div class="card-body">
+                    <h4 class="card-title">Category <span class="badge bg-danger">{{category.name}}</span></h4>
+                    <p class="card-text">{{category.description}}</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Total time:</b> {{category.total_time}}</li>
+                </ul>
+                <div class="card-footer d-inline-flex justify-content-end">
+                    <a href="{% url 'app_tracker:category_edit' category.id %}" class="btn btn-sm btn-secondary me-1" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
+                        </svg>
+                    </a>
+
+                    <a href="{% url 'app_tracker:category_delete' category.id %}" class="btn btn-sm btn-danger me-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Time interval -->
+            {% if category_all_logs %}
+                <div class="mt-2">
+                    <!-- Set interval -->
+                    <form class= method="GET" action="{% url 'app_tracker:category' category.id %}">
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text" id="basic-addon1">Start</span>
+                            <input type="date" class="form-control" name="adjust_interval_start">
+                        </div>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text" id="basic-addon1">End</span>
+                            <input type="date" class="form-control" name="adjust_interval_end">
+                        </div>
+                        <input type="submit" class="btn btn-primary btn-sm mb-1" value="Set time interval">
+                    </form>
+                    <!-- Reset interval -->
+                    <form class="d-inline-flex" method="GET" action="{% url 'app_tracker:category' category.id %}">
+                        <input type="hidden" name="adjust_interval_start" value="reset">
+                        <input type="hidden" name="adjust_interval_end" value="reset">
+                        <input type="submit" class="btn btn-secondary btn-sm" value="Reset">
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>            
     
-    <p><b>Description:</b> {{category.description}}</p>
+        <!-- Right side -->
+        <div class="col-9 justify-content-center">
 
-    <p><b>All time:</b> {{category.total_time}}</p>
+            <div class="row text-center">
+            <!-- Chart -->
+            {% if category_all_logs %}
+    
+                {{category_chart|safe}}
+                <p class="text-small">({{interval_start}} - {{interval_end}})</p>
 
-    <b>All category activities:</b>
-    <table border callpadding="10">
-        <tr align='center' valign='middle'>
-            <th>No.</th>
-            <th>Activity</th>
-            <th>Color</th>
-            <th>Total time</th>
-            <th>Last activity</th>
-        </tr align='center' valign='middle'>
-        {% if category_all_activities %}
-            {% for activity in category_all_activities %}
-            <tr>
-                <th scope='row'>{{ forloop.counter }}</th>
-                <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
-                <td style="color:{{activity.color}}">{{activity.color}}</td>
-                <td>
-                    {% if activity.total_time %}
-                        {{activity.total_time}}
-                    {% else %}
-                     -
+            {% endif %}
+            </div>            
+            
+            <!-- Category activities -->
+            <div class="row d-flex justify-content-center">
+                
+                <!-- Create activity -->
+                <!-- Button - trigger modal -->
+                <div class="text-center">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Create new activity</button>
+                </div>
+                <!-- Modal - Create new category -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Create new activity</h1>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body col-10 align-self-center">
+                                    <div class="input-group input-group-sm flex-nowrap mb-2">
+                                        <span class="input-group-text" id="addon-wrapping">Name</span>
+                                        <input type="text" name="name" class="form-control" placeholder="e.g. running" aria-label="Name" aria-describedby="addon-wrapping">
+                                    </div>
+                                    <div class="input-group input-group-sm mb-2">
+                                        <label class="input-group-text" for="inputGroupSelect01">Color</label>
+                                        <select class="form-select" name="color" id="inputGroupSelect01">
+                                            <option value="gray">gray</option>
+                                            <option value="yellow">yellow</option>
+                                            <option value="purple">purple</option>
+                                            <option value="orange">orange</option>
+                                            <option value="blue">blue</option>
+                                            <option value="green">green</option>
+                                            <option value="black">black</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                    <input type="submit" class="btn btn-success btn-sm" value="Save">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-8">
+
+                    {% if category_all_activities %}
+                        <table class="table table-hover table-bordered table-sm mt-3 align-self-center text-small">
+                            <thead class="table-secondary text-center align-text-middle">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Activity</th>
+                                    <th>Color</th>
+                                    <th>Total time</th>
+                                    <th>Last log</th>
+                                </tr>
+                            </thead>   
+            
+                            <tbody class="text-center align-text-middle">
+                                {% for activity in category_all_activities %}
+                                    <tr>
+                                        <th scope='row'>{{ forloop.counter }}</th>
+                                        <td><a href="{% url 'app_tracker:activity' activity.id %}">{{activity.name}}</a></td>
+                                        <td style="color: {{activity.color}}">{{activity.color}}</td>
+                                        <td>
+                                            {% if activity.total_time %}
+                                                {{activity.total_time}}
+                                            {% else %}
+                                            -
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if activity.last_log %}
+                                                {{activity.last_log.date|date:'Y-m-d'}} - <i>{{activity.last_log.start_time|time:"H:i"}}</i>
+                                            {% else %}
+                                                <i>no logs yet</i>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>                
+                        </table>
+
+                        {% else %}
+                        <hr>
+                        <p class="text-center">It seems that you have no activities yet!</p>
                     {% endif %}
-                </td>
-                <td>
-                    {% if activity.last_log %}
-                        {{activity.last_log.date|date:'Y-m-d'}} - <i>{{activity.last_log.start_time|time:"H:i"}}</i>
-                    {% else %}
-                        <i>no activities yet</i>
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        {% endif %}                
-        <tr align='center' valign='middle'>
-            <form method="POST">
-                {% csrf_token %}
-                <th>+</th>
-                <td><input type="text" id="name" name="name"></td>
-                <td>
-                    <select name="color" id="color"><br>
-                        <option value="gray">gray</option>
-                        <option value="yellow">yellow</option>
-                        <option value="purple">purple</option>
-                        <option value="orange">orange</option>
-                        <option value="blue">blue</option>
-                        <option value="green">green</option>
-                        <option value="black">black</option>
-                    </select>
-                </td>
-                <td colspan="2"><input type="submit" value="Create new activity"></td>            
-            </form>
-        </tr>
-    </table>
+                </div>    
+            </div>    
 
+        </div>
+
+    </div>
+
+</div>
 {% endblock content %}

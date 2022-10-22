@@ -68,8 +68,12 @@ def category(request, category_id):
         else:
             category_all_logs = category_all_logs.filter(date__lte=adjust_interval_end)
      
-    interval_start = category_all_logs.earliest('date', 'start_time').date
-    interval_end = category_all_logs.latest('date', 'start_time').date
+    try:
+        interval_start = category_all_logs.earliest('date', 'start_time').date
+        interval_end = category_all_logs.latest('date', 'start_time').date
+    except ObjectDoesNotExist:
+        interval_start = None
+        interval_end = None
 
     #---> chart data
     all_dates = []
@@ -122,11 +126,11 @@ def category(request, category_id):
         )
 
     fig.update_layout(
-        xaxis=dict(title="Date",showgrid=True, gridwidth=1, gridcolor='Lightgray'),
-        yaxis=dict(title="Time logged", showgrid=True, gridwidth=1, gridcolor='Lightgray',),
+        xaxis=dict(title=None,showgrid=True, gridwidth=1, gridcolor='Lightgray'),
+        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray',),
         margin=dict(l=0, r=0, b=0, t=0),
         autosize=True,
-        height=400,
+        height=300,
         plot_bgcolor='white',
         hovermode=False,
         legend=dict(
@@ -240,11 +244,11 @@ def activity(request, activity_id):
     fig.update_traces(connectgaps=True)
 
     fig.update_layout(
-        xaxis=dict(title="Date",showgrid=True, gridwidth=1, gridcolor='Lightgray'),
-        yaxis=dict(title="Time logged", showgrid=True, gridwidth=1, gridcolor='Lightgray',),
+        xaxis=dict(title=None,showgrid=True, gridwidth=1, gridcolor='Lightgray'),
+        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray',),
         margin=dict(l=0, r=0, b=0, t=0),
         autosize=True,
-        height=400,
+        height=300,
         plot_bgcolor='white',
         hovermode=False,
         showlegend=False,
