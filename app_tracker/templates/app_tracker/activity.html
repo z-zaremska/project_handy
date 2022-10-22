@@ -1,65 +1,187 @@
 {% extends 'base.html' %}
 
+
+{% block navbar %}
+<!-- Link tree -->
+<a href="{% url 'app_tracker:tracker_home' %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">
+    | Activity tracker
+</a>
+<a href="{% url 'app_tracker:category' activity.category.id %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">
+    | {{activity.category}}
+</a>
+<!-- Recent page -->
+<a href="{% url 'app_tracker:activity' activity.id %}" class="d-inline-flex align-items-center disabled"></a>
+    <p class="text-align-middle my-auto me-1">| {{activity.name}}</p>   
+</a>
+
+{% endblock navbar %}
+
+
 {% block content %}
+<div class="col-lg mx-auto p-1 py-md-4 justify-content-center">
 
-    <h1><a href="{% url 'app_tracker:category' activity.category.id %}">{{activity.category}}</a> | Activity: <i>{{activity.name}}</i></h1>
-    <ul>
-        <li><a href="{% url "app_tracker:activity_edit" activity.id %}">Edit activity</a></li>
-        <li><a href="{% url "app_tracker:activity_delete" activity.id %}">Delete activity</a></li>
-    </ul>
+    <!-- Activity description + chart -->
+    <div class="row">
 
-    <h2>Details</h2>
-    {% if all_activity_logs %}
-        {{ activity_chart|safe }}
-        <center>
-            <h4>({{interval_start}} - {{interval_end}})</h4>
-        </center>
+        <!-- Left side-->
+        <div class="col-3">
 
-        <center>
-            <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
-                From {{chart_interval_form.adjust_interval_start}} to {{chart_interval_form.adjust_interval_end}}<br>
-                <input type="submit" value="Set time interval">
-            </form>
-            <form method="GET" action="{% url 'app_tracker:activity' activity.id %}">
-                <input type="hidden" name="adjust_interval_start" value="reset">
-                <input type="hidden" name="adjust_interval_end" value="reset">
-                <input type="submit" value="Reset">
-            </form>
-        </center>
-    {% endif %}
-    <p><b>Category:</b> {{activity.category}}</p>
-    <p><b>Time summary:</b> {{activity.total_time}}</p>
-    <p><b>Logs:</b></p>    
-    <table border callpadding="10">
-        <tr align='center' valign='middle'>
-            <th>No.</th>
-            <th>Date</th>
-            <th>Start time</th>
-            <th>Logged time</th>
-            <th colspan="2">Action</th>
-        </tr>
-        <tr align='center' valign='middle'>
-            <form method="POST">
-                {% csrf_token %}
-                <th>+</th>
-                <td><input name="date" id="date" type="date">
-                <td><input name="start_time" id="start_time" type="time"></td>
-                <td><input name="log_time" id="log_time" step="2" type="time"></td>
-                <td colspan="2"><input type="submit" value="New time log"></td>            
-            </form>
-        </tr>
-        {% if all_activity_logs %}
-            {% for log in all_activity_logs %}
-            <tr align='center' valign='middle'>
-                <th scope='row'>{{ forloop.counter }}</th>
-                <td>{{log.date|date:'Y-m-d'}}</td>
-                <td>{{log.start_time|time:"H:i"}}</td>
-                <td>{{log.log_time}}</td>
-                <td><a href="{% url "app_tracker:timelog_edit" log.id %}">edit</a></td>
-                <td><a href="{% url "app_tracker:timelog_delete" log.id %}">delete</a></td>
-            </tr>
-            {% endfor %}
-        {% endif %}
-    </table>
+            <!-- Activity details -->
+            <div class="card" style="me-2">
+                <div class="card-body">
+                    <h4 class="card-title">Activity <span class="badge bg-secondary" style="badge-color: {{activity.color}}">{{activity.name}}</span></h4>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Category:</b> <a href="{% url 'app_tracker:category' activity.category.id %}">{{activity.category}}</a></li>
+                </ul>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Total time:</b> {{activity.total_time}}</li>
+                </ul>
+                <div class="card-footer d-inline-flex justify-content-end">
+                    <!-- Edit activity -->
+                    <a href="{% url "app_tracker:activity_edit" activity.id %}" class="btn btn-sm btn-secondary me-1" >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
+                        </svg>
+                    </a>
+                    <!-- Delete activity -->
+                    <a href="{% url "app_tracker:activity_delete" activity.id %}" class="btn btn-sm btn-danger me-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
 
+            <!-- Time interval -->
+            {% if activity_all_logs %}
+                <div class="mt-2">
+                    <!-- Set interval -->
+                    <form class= method="GET" action="{% url 'app_tracker:activity' activity.id %}">
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text" id="basic-addon1">Start</span>
+                            <input type="date" class="form-control" name="adjust_interval_start">
+                        </div>
+                        <div class="input-group input-group-sm mb-1">
+                            <span class="input-group-text" id="basic-addon1">End</span>
+                            <input type="date" class="form-control" name="adjust_interval_end">
+                        </div>
+                        <input type="submit" class="btn btn-primary btn-sm mb-1" value="Set time interval">
+                    </form>
+                    <!-- Reset interval -->
+                    <form class="d-inline-flex" method="GET" action="{% url 'app_tracker:activity' activity.id %}">
+                        <input type="hidden" name="adjust_interval_start" value="reset">
+                        <input type="hidden" name="adjust_interval_end" value="reset">
+                        <input type="submit" class="btn btn-secondary btn-sm" value="Reset">
+                    </form>
+                </div>
+            {% endif %}
+
+        </div>            
+    
+        <!-- Right side -->
+        <div class="col-9 justify-content-center">
+
+            <div class="row text-center">
+            <!-- Chart -->
+            {% if activity_all_logs %}
+    
+                {{activity_chart|safe}}
+                <p class="text-small">({{interval_start}} - {{interval_end}})</p>
+
+            {% endif %}
+            </div>            
+            
+            <!-- Activity logs -->
+            <div class="row d-flex justify-content-center">
+                
+                <!-- Create log -->
+                <!-- Button - trigger modal -->
+                <div class="text-center">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Create new time log</button>
+                </div>
+                <!-- Modal - Create new time log -->
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Create new time log</h1>
+                            </div>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body col-10 align-self-center">
+                                    <div class="input-group input-group-sm flex-nowrap mb-2">
+                                        <span class="input-group-text" id="addon-wrapping">Date</span>
+                                        <input type="date" name="date" class="form-control" placeholder="e.g. running" aria-label="Name" aria-describedby="addon-wrapping">
+                                    </div>
+                                    <div class="input-group input-group-sm flex-nowrap mb-2">
+                                        <span class="input-group-text" id="addon-wrapping">Start time</span>
+                                        <input type="time" name="start_time" class="form-control" placeholder="e.g. running" aria-label="Name" aria-describedby="addon-wrapping">
+                                    </div>
+                                    <div class="input-group input-group-sm flex-nowrap mb-2">
+                                        <span class="input-group-text" id="addon-wrapping">Log time</span>
+                                        <input type="time" name="log_time" step="2" class="form-control" placeholder="e.g. running" aria-label="Name" aria-describedby="addon-wrapping">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                    <input type="submit" class="btn btn-success btn-sm" value="Save">
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-8">
+
+                    {% if activity_all_logs %}
+                        <table class="table table-hover table-bordered table-sm mt-3 align-self-center text-small">
+                            <thead class="table-secondary text-center align-text-middle">
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Date</th>
+                                    <th>Start time</th>
+                                    <th>Logged time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>   
+            
+                            <tbody class="text-center align-items-middle">
+                                {% for log in activity_all_logs %}
+                                    <tr>
+                                        <th scope='row'>{{ forloop.counter }}</th>
+                                        <td>{{log.date|date:'Y-m-d'}}</td>
+                                        <td>{{log.start_time|time:"H:i"}}</td>
+                                        <td>{{log.log_time}}</td>
+                                        <td>
+                                            <!-- Edit log -->
+                                            <a href="{% url "app_tracker:timelog_edit" log.id %}" class="btn btn-sm btn-secondary me-1" >
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                                                    <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
+                                                </svg>
+                                            </a>
+                                            <!-- Delete log -->
+                                            <a href="{% url "app_tracker:timelog_delete" log.id %}" class="btn btn-sm btn-danger me-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                                    <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"></path>
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>                
+                        </table>
+
+                        {% else %}
+                        <hr>
+                        <p class="text-center">It seems that you have no time logs yet!</p>
+                    {% endif %}
+                </div>    
+            </div>    
+
+        </div>
+
+    </div>
+
+</div>
 {% endblock content %}

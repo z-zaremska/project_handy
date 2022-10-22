@@ -48,4 +48,4 @@ class TimeLog(models.Model):
 
     class Meta:
         verbose_name_plural = 'timelogs'
-        ordering = ['-date']
+        ordering = ['-date', '-start_time']

@@ -270,7 +270,7 @@ def activity(request, activity_id):
     #Context
     context = {
         'activity': activity,
-        'all_activity_logs': all_logs,
+        'activity_all_logs': all_logs,
         'activity_chart': activity_chart,
         'chart_interval_form': chart_interval_form,
         'adjust_interval_start': adjust_interval_start,
