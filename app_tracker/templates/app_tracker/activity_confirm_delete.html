@@ -17,7 +17,7 @@
         <div class="d-inline-flex justify-content-end">
             <form method="POST">
                 {% csrf_token %}
-                <input class="btn btn-danger" type="submit" value="Delete category">
+                <input class="btn btn-danger" type="submit" value="Delete activity">
                 <a href="{% url 'app_tracker:activity' activity.id %}" class="btn btn-secondary">Cancel</a>
             </form>
         </div>

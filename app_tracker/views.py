@@ -35,20 +35,32 @@ def category(request, category_id):
     category_all_activities = Activity.objects.filter(category=category).all()
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
     
-    colors = ['red']
+    # Activities colors
+    colors = ['red'] # default category color
     for activity in category_all_activities:
         colors.append(activity.color)
     
-    #Create new Activity
-    if request.method == "POST":
-        activity_form = ActivityForm(request.POST or None)
+    #Multiple forms
+    if request.method == 'POST':
+        # create activity
+        if request.POST.get("form_type") == 'create_activity_form':
+            activity_form = ActivityForm(request.POST or None)
 
-        if activity_form.is_valid():
-            new_activity = activity_form.save(commit=False)
-            new_activity.category = category
-            new_activity.save()
-            messages.success(request, "New activity has been created!")
-            return redirect('app_tracker:category', category.pk)
+            if activity_form.is_valid():
+                new_activity = activity_form.save(commit=False)
+                new_activity.category = category
+                new_activity.save()
+                messages.success(request, "New activity has been created!")
+                return redirect('app_tracker:category', category.pk)
+
+        #edit category
+        elif request.POST.get("form_type") == 'edit_category_form':
+            category_form = CategoryForm(request.POST or None, instance=category)
+
+            if category_form.is_valid():
+                category_form.save()
+                messages.success(request, ("Category has been updated!"))
+                return redirect('app_tracker:category', category_id)
       
     #Category data frame
     #---> adjusting chart time interval
@@ -144,7 +156,7 @@ def category(request, category_id):
         )
    
     category_chart = fig.to_html(config = {'displayModeBar': False},)
-    
+
     #Context
     context = {
         'category': category,
@@ -159,19 +171,6 @@ def category(request, category_id):
     }
 
     return render(request, 'app_tracker/category.html', context)
-
-def category_edit(request, category_id):
-    category = Category.objects.get(pk=category_id)
-
-    if request.method == 'POST':
-        category_form = CategoryForm(request.POST or None, instance=category)
-
-        if category_form.is_valid():
-            category_form.save()
-            messages.success(request, ("Category has been updated!"))
-            return redirect('app_tracker:category', category_id)
-
-    return render(request, 'app_tracker/category_edit.html', {'category': category})
 
 def category_delete(request, category_id):
     category = Category.objects.get(pk=category_id)

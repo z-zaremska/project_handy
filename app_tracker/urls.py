@@ -6,7 +6,6 @@ app_name = 'app_tracker'
 urlpatterns = [
     path('', views.tracker_home, name='tracker_home'),
     path('category/<category_id>/', views.category, name='category'),
-    path('category/<category_id>/edit', views.category_edit, name='category_edit'),
     path('category/<category_id>/delete', views.category_delete, name="category_delete"),    
     path('activity/<activity_id>/', views.activity, name='activity'),
     path('activity/<activity_id>/edit', views.activity_edit, name='activity_edit'),
