@@ -39,11 +39,11 @@
                 </ul>
                 <div class="card-footer d-inline-flex justify-content-end">
                     <!-- Edit activity -->
-                    <a href="{% url "app_tracker:activity_edit" activity.id %}" class="btn btn-sm btn-secondary me-1" >
+                    <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#edit-activity-Modal">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
                             <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"></path>
                         </svg>
-                    </a>
+                    </button>
                     <!-- Delete activity -->
                     <a href="{% url "app_tracker:activity_delete" activity.id %}" class="btn btn-sm btn-danger me-1">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
@@ -52,6 +52,44 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Modal - Edit activity -->
+            <div class="modal fade" id="edit-activity-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Edit activity <b>{{activity.name}}</b></h1>
+                        </div>
+                        <form method="POST" id="edit_activity_form">
+                            <input type="hidden" name="form_type" value="edit_activity_form">
+                            {% csrf_token %}
+                            <div class="modal-body col-10 align-self-center">
+                                <div class="input-group input-group-sm flex-nowrap mb-2">
+                                    <span class="input-group-text" id="addon-wrapping">Name</span>
+                                    <input type="text" name="name" class="form-control" value="{{activity.name}}" aria-label="Name" aria-describedby="addon-wrapping">
+                                </div>
+                                <div class="input-group input-group-sm mb-2">
+                                    <label class="input-group-text" for="inputGroupSelect01">Color</label>
+                                    <select class="form-select" name="color" id="inputGroupSelect01">
+                                        <option selected="{{activity.color}}">{{activity.color}}</option>
+                                        <option value="gray">gray</option>
+                                        <option value="yellow">yellow</option>
+                                        <option value="purple">purple</option>
+                                        <option value="orange">orange</option>
+                                        <option value="blue">blue</option>
+                                        <option value="green">green</option>
+                                        <option value="black">black</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                                <input type="submit" class="btn btn-success btn-sm" value="Save">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>            
 
             <!-- Time interval -->
             {% if activity_all_logs %}
@@ -98,16 +136,17 @@
                 <!-- Create log -->
                 <!-- Button - trigger modal -->
                 <div class="text-center">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">Create new time log</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#create-timelog-Modal">Create new time log</button>
                 </div>
                 <!-- Modal - Create new time log -->
-                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal fade" id="create-timelog-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h1 class="modal-title fs-5 text-center" id="exampleModalLabel">Create new time log</h1>
                             </div>
-                            <form method="POST">
+                            <form method="POST" id="create_timelog_form">
+                                <input type="hidden" name="form_type" value="create_timelog_form">
                                 {% csrf_token %}
                                 <div class="modal-body col-10 align-self-center">
                                     <div class="input-group input-group-sm flex-nowrap mb-2">

@@ -8,7 +8,6 @@ urlpatterns = [
     path('category/<category_id>/', views.category, name='category'),
     path('category/<category_id>/delete', views.category_delete, name="category_delete"),    
     path('activity/<activity_id>/', views.activity, name='activity'),
-    path('activity/<activity_id>/edit', views.activity_edit, name='activity_edit'),
     path('activity/<activity_id>/delete', views.activity_delete, name="activity_delete"),
     path('timelog/<timelog_id>/edit', views.timelog_edit, name="timelog_edit"),
     path('timelog/<timelog_id>/delete', views.timelog_delete, name="timelog_delete"),

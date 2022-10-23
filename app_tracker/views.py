@@ -254,16 +254,27 @@ def activity(request, activity_id):
     
     activity_chart = fig.to_html(config = {'displayModeBar': False},)
 
-    #Create new time log
+    #Multiple forms
     if request.method == 'POST':
-        timelog_form = TimeLogForm(request.POST or None)     
-    
-        if timelog_form.is_valid():
-            new_timelog = timelog_form.save(commit=False)
-            new_timelog.activity = activity
-            new_timelog.save()    
-            messages.success(request, ("New log has been created!"))
-            return redirect('app_tracker:activity', activity.pk)
+        # create time log
+        if request.POST.get("form_type") == 'create_timelog_form':
+            timelog_form = TimeLogForm(request.POST or None)     
+        
+            if timelog_form.is_valid():
+                new_timelog = timelog_form.save(commit=False)
+                new_timelog.activity = activity
+                new_timelog.save()    
+                messages.success(request, ("New log has been created!"))
+                return redirect('app_tracker:activity', activity.pk)
+        
+        # elif request.POST.get("form_type") == 'edit_timelog_form':
+
+        elif request.POST.get("form_type") == 'edit_activity_form':
+            activity_form = ActivityForm(request.POST or None, instance=activity)
+            if activity_form.is_valid():
+                activity_form.save()
+                messages.success(request, ("Activity has been updated!"))
+                return redirect('app_tracker:activity', activity.pk)
     
     #Context
     context = {
@@ -279,18 +290,6 @@ def activity(request, activity_id):
     }
 
     return render(request, 'app_tracker/activity.html', context)
-
-def activity_edit(request, activity_id):
-    activity = Activity.objects.get(pk=activity_id)
-
-    if request.method == 'POST':
-        activity_form = ActivityForm(request.POST or None, instance=activity)
-        if activity_form.is_valid():
-            activity_form.save()
-            messages.success(request, ("Activity has been updated!"))
-            return redirect('app_tracker:activity', activity.pk)
-
-    return render(request, 'app_tracker/activity_edit.html', {'activity': activity})
 
 def activity_delete(request, activity_id):
     activity = Activity.objects.get(pk=activity_id)
