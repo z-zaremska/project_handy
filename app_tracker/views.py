@@ -188,7 +188,7 @@ def activity(request, activity_id):
     activity = Activity.objects.get(pk=activity_id)
     all_logs = TimeLog.objects.filter(activity=activity).all()
     
-    #Chart data for Activity
+    # Chart data for Activity
     #---> adjusting chart time interval
     adjust_interval_start = request.GET.get('adjust_interval_start')
     adjust_interval_end = request.GET.get('adjust_interval_end')
@@ -230,7 +230,7 @@ def activity(request, activity_id):
     activity_page_df.index.name = "Dates"
     activity.total_time = activity_page_df[f"Activity {activity.name}"].sum()
     
-    # #---> chart configuration
+    #---> chart configuration
     fig = px.line(
         activity_page_df,
         markers=True,
@@ -254,7 +254,7 @@ def activity(request, activity_id):
     
     activity_chart = fig.to_html(config = {'displayModeBar': False},)
 
-    #Multiple forms
+    # Multiple forms
     if request.method == 'POST':
         # create time log
         if request.POST.get("form_type") == 'create_timelog_form':
@@ -315,7 +315,8 @@ def timelog_edit(request, timelog_id):
             messages.success(request, ("Time log has been updated!"))
             return redirect('app_tracker:activity', activity_id)
     
-    return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity_id,})
+    form = TimeLogForm(instance=timelog)
+    return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity_id, 'form': form,})
 
 def timelog_delete(request, timelog_id):
     timelog = TimeLog.objects.get(pk=timelog_id)
