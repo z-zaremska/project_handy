@@ -1,14 +1,25 @@
-from django.shortcuts import render, redirect
+from django.http import Http404
+from django.shortcuts import get_object_or_404, render, redirect
+from django.contrib.auth.decorators import login_required
 from app_tracker.models import Category, Activity, TimeLog
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
+from django.core.exceptions import ObjectDoesNotExist
 from collections import defaultdict
 from django.contrib import messages
 from datetime import timedelta
 import pandas as pd
 import plotly.express as px
-from django.core.exceptions import ObjectDoesNotExist
 
-# App home
+#FUNCTIONS
+
+def check_category_owner(category, request):
+    """Checks if the owner of the categroy is recent logged in user."""
+    if category.owner != request.user:
+        raise Http404
+
+#VIEWS
+
+#App home
 
 def tracker_home(request):
     all_categories = Category.objects.all()
@@ -30,17 +41,19 @@ def tracker_home(request):
 
 #Category
 
+@login_required
 def category(request, category_id):
-    category = Category.objects.get(pk=category_id)
+    category = get_object_or_404(Category, pk=category_id)
+    check_category_owner(category, request)
     category_all_activities = Activity.objects.filter(category=category).all()
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
     
-    # Activities colors
+    # Activities colors for chart
     colors = ['red'] # default category color
     for activity in category_all_activities:
         colors.append(activity.color)
     
-    #Multiple forms
+    # Multiple forms
     if request.method == 'POST':
         # create activity
         if request.POST.get("form_type") == 'create_activity_form':
@@ -53,7 +66,7 @@ def category(request, category_id):
                 messages.success(request, "New activity has been created!")
                 return redirect('app_tracker:category', category.pk)
 
-        #edit category
+        # edit category
         elif request.POST.get("form_type") == 'edit_category_form':
             category_form = CategoryForm(request.POST or None, instance=category)
 
@@ -62,7 +75,7 @@ def category(request, category_id):
                 messages.success(request, ("Category has been updated!"))
                 return redirect('app_tracker:category', category_id)
       
-    #Category data frame
+    # Category data frame
     #---> adjusting chart time interval
 
     adjust_interval_start = request.GET.get('adjust_interval_start')
@@ -114,7 +127,7 @@ def category(request, category_id):
     category_page_df[f'Category "{category.name}"'] = category_page_df.iloc[:, 1:].sum(axis=1)
     print(category_page_df)
 
-    #Total time for category and activity
+    # Total time for category and activity
     category.total_time = category_page_df[f'Category "{category.name}"'].sum()
     for activity in category_all_activities:
         activity.total_time = category_page_df[f'Activity "{activity.name}"'].sum()
@@ -123,7 +136,7 @@ def category(request, category_id):
         except ObjectDoesNotExist:
             pass
 
-    #Category chart - line
+    # Category chart - line
     fig = px.line(
         category_page_df,
         markers=True,
@@ -157,7 +170,7 @@ def category(request, category_id):
    
     category_chart = fig.to_html(config = {'displayModeBar': False},)
 
-    #Context
+    # Context
     context = {
         'category': category,
         'category_all_activities': category_all_activities,
@@ -172,8 +185,10 @@ def category(request, category_id):
 
     return render(request, 'app_tracker/category.html', context)
 
+@login_required
 def category_delete(request, category_id):
-    category = Category.objects.get(pk=category_id)
+    category = get_object_or_404(Category, pk=category_id)
+    check_category_owner(category, request)
     all_related_activities = Activity.objects.filter(category=category).all()
 
     if request.method == 'POST':
@@ -184,8 +199,10 @@ def category_delete(request, category_id):
 
 #Activity
 
+@login_required
 def activity(request, activity_id):
-    activity = Activity.objects.get(pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id)
+    check_category_owner(activity.category, request)    
     all_logs = TimeLog.objects.filter(activity=activity).all()
     
     # Chart data for Activity
@@ -196,12 +213,12 @@ def activity(request, activity_id):
 
     if adjust_interval_start:
         if adjust_interval_start == 'reset':
-            all_logs = all_logs            
+            all_logs = all_logs
         else:
             all_logs = all_logs.filter(date__gte=adjust_interval_start)
     if adjust_interval_end:
         if adjust_interval_end == 'reset':
-            all_logs = all_logs            
+            all_logs = all_logs        
         else:
             all_logs = all_logs.filter(date__lte=adjust_interval_end)
      
@@ -211,7 +228,7 @@ def activity(request, activity_id):
     except ObjectDoesNotExist:
         interval_start = None
         interval_end = None
-    
+
     #---> chart data
     activity_logs_dates = [log.date for log in all_logs]
     activity_logs_time = [log.log_time for log in all_logs]
@@ -291,8 +308,10 @@ def activity(request, activity_id):
 
     return render(request, 'app_tracker/activity.html', context)
 
+@login_required
 def activity_delete(request, activity_id):
-    activity = Activity.objects.get(pk=activity_id)
+    activity = get_object_or_404(Activity, pk=activity_id)
+    check_category_owner(activity.category, request)    
     all_related_logs = TimeLog.objects.filter(activity=activity).all()
     category_id = activity.category.pk
 
@@ -304,23 +323,28 @@ def activity_delete(request, activity_id):
 
 #TimeLog
 
+@login_required
 def timelog_edit(request, timelog_id):
-    timelog = TimeLog.objects.get(pk=timelog_id)
-    activity_id = timelog.activity.pk
+    timelog = get_object_or_404(TimeLog, pk=timelog_id)
+    activity = timelog.activity
+    check_category_owner(activity.category, request) 
 
     if request.method == 'POST':
         timelog_form = TimeLogForm(request.POST or None, instance=timelog)
         if timelog_form.is_valid():
             timelog_form.save()
             messages.success(request, ("Time log has been updated!"))
-            return redirect('app_tracker:activity', activity_id)
+            return redirect('app_tracker:activity', activity.pk)
     
     form = TimeLogForm(instance=timelog)
-    return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity_id, 'form': form,})
+    return render(request, 'app_tracker/timelog_edit.html', {'timelog': timelog, "activity_id": activity.pk, 'form': form,})
 
+@login_required
 def timelog_delete(request, timelog_id):
-    timelog = TimeLog.objects.get(pk=timelog_id)
-    activity_id = timelog.activity.pk
+    timelog = get_object_or_404(TimeLog, pk=timelog_id)
+    activity = timelog.activity
+    check_category_owner(activity.category, request)
+    activity_id = activity.pk
     timelog.delete()
     messages.success(request, ('Time log has been deleted.'))
     return redirect('app_tracker:activity', activity_id)

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     #my apps
     'app_tracker.apps.AppTrackerConfig',
     'bootstrap5',
+    'users',
 
     
     #default apps
@@ -132,3 +133,15 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# My settings
+LOGIN_URL = 'users:login'
+
+# Heroku settings
+import django_heroku
+django_heroku.settings(locals())
+
+if os.environ.get('DEBUG') == 'TRUE':
+    DEBUG = True
+elif os.environ.get('DEBUG') == 'FALSE':
+    DEBUG = False
