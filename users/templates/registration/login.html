@@ -1,0 +1,27 @@
+{% extends 'base_project.html' %}
+
+
+{% block title %}| Log in{% endblock title%}
+
+{% block navbar %}<a class="nav-link fw-bold py-1 px-0" href="{% url 'project_home' %}">Project handy</a>{% endblock navbar %}
+
+
+{% block content %}
+<h1>
+    <svg xmlns="http://www.w3.org/2000/svg" width="70" height="70" fill="currentColor" class="bi bi-emoji-laughing" viewBox="0 0 16 16">
+        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+        <path d="M12.331 9.5a1 1 0 0 1 0 1A4.998 4.998 0 0 1 8 13a4.998 4.998 0 0 1-4.33-2.5A1 1 0 0 1 4.535 9h6.93a1 1 0 0 1 .866.5zM7 6.5c0 .828-.448 0-1 0s-1 .828-1 0S5.448 5 6 5s1 .672 1 1.5zm4 0c0 .828-.448 0-1 0s-1 .828-1 0S9.448 5 10 5s1 .672 1 1.5z"/>
+    </svg>
+    <br>
+    Log in
+</h1>
+<form method="post" action="{% url 'users:login' %}">
+    {% csrf_token %}
+    <label for="username" class="col-form-label">Username</label><input name="username" id="username" class="form-control form-control-sm my-2" type="username">
+    <label for="password" class="col-form-label">Password</label><input name="password" id="username" class="form-control form-control-sm my-2" type="password">
+    <input type="submit" value="Log in" class="btn btn-success btn-sm mt-3 me-2">
+    <a href="{% url 'users:register' %}" class="btn btn-primary btn-sm mt-3">Register</a>
+    <input type="hidden" name="next" value="{% url 'project_home' %}">
+</form>
+
+{% endblock content %}

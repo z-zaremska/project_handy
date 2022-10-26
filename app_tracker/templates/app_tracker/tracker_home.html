@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_app.html' %}
 
 {% block navbar %}
 
@@ -12,10 +12,12 @@
 {% block content %}
 
 <div class="col-lg-6 mx-auto p-1 py-md-4">
+
+    {% if user.is_authenticated %}
     <!-- Logged in -->
     <div class="mb-3 text-center">
         <div class="col-md">
-            <h4 class="display-6">Your categories (<i>login</i>)</h4>
+            <h4 class="display-6">Your categories</h4>
             {% if all_categories %}
                 <ul class="list-unstyled">
                 {% for category in all_categories %}
@@ -61,16 +63,16 @@
         </div>
     </div>
 
-
+    {% else %}
     <!-- Logged out -->
     <div>
         <!-- App details -->
         <div class="card">
-            <h5 class="card-header text-center bg-dark text-white display-6"><svg class="bi me-2" width="45" height="45"><use xlink:href="#speedometer2"/></svg>Activity tracker (<i>logout</i>)</h5>
+            <h5 class="card-header text-center bg-dark text-white display-6"><svg class="bi me-2" width="45" height="45"><use xlink:href="#speedometer2"/></svg>Activity tracker</h5>
             <div class="card-body text-center">
             <p class="card-text">Activity tracker app allows you to track time spent on any activity you want. By auto-responsive charts you can analize your progress and assumptions during the process.</p>
             <div class="text-center">
-                <a href="#" class="btn btn-dark">Start now!</a>
+                <a href="{% url 'users:login' %}" class="btn btn-dark">Start now!</a>
             </div>
             </div>
         </div>
@@ -79,7 +81,7 @@
             <!-- Example section -->
             <div class="col-md">
                 <div class=" h-100 p-3 text-bg-primary rounded-3">
-                    <h5>Example of use (logout)</h5>
+                    <h5>Example of use</h5>
                     <hr>
                     <p>
                         Here you can see some real example of using the tracker app by me during my programming learning process.
@@ -93,7 +95,7 @@
             <!-- Technology section -->
             <div class="col-md">
                 <div class="h-100 p-3 bg-warning border rounded-3">
-                    <h5>Used technology (logout)</h5>
+                    <h5>Used technology</h5>
                     <hr>
                     <ol>
                         <li>python 3.10.8</li>
@@ -107,6 +109,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
 </div>
 
