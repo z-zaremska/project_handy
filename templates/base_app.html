@@ -171,7 +171,7 @@
                       </li>
                       {% if user.is_authenticated %}
                       <li>
-                        <a href="{% url 'users:login' %}" class="nav-link text-white">
+                        <a href="{% url 'users:login' %}" class="nav-link text-white disabled">
                           <svg class="bi d-block mx-auto mb-1" width="24" height="24"><use xlink:href="#person"/></svg>
                           {{user.username}}
                         </a>

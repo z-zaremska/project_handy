@@ -22,14 +22,19 @@ def check_category_owner(category, request):
 #App home
 
 def tracker_home(request):
-    all_categories = Category.objects.all()
+    all_categories = []
+    if request.user.is_anonymous != True:
+        all_categories = Category.objects.all().filter(owner=request.user)
 
     #Create new category
     if request.method == 'POST':
-        category_form = CategoryForm(request.POST or None)     
+        category_form = CategoryForm(request.POST or None)
+        print(category_form.is_valid())    
     
         if category_form.is_valid():
-            category_form.save()  
+            new_category = category_form.save(commit=False)
+            new_category.owner = request.user
+            new_category.save()
             messages.success(request, ("New category has been created!"))
             return redirect('app_tracker:tracker_home')
 

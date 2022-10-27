@@ -72,7 +72,7 @@
             <div class="card-body text-center">
             <p class="card-text">Activity tracker app allows you to track time spent on any activity you want. By auto-responsive charts you can analize your progress and assumptions during the process.</p>
             <div class="text-center">
-                <a href="{% url 'users:login' %}" class="btn btn-dark">Start now!</a>
+                <a href="{% url 'users:login' %}?next={{request.path}}" class="btn btn-dark">Start now!</a>
             </div>
             </div>
         </div>
