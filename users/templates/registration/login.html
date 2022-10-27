@@ -21,7 +21,12 @@
     <label for="password" class="col-form-label">Password</label><input name="password" id="username" class="form-control form-control-sm my-2" type="password">
     <input type="submit" value="Log in" class="btn btn-success btn-sm mt-3 me-2">
     <a href="{% url 'users:register' %}" class="btn btn-primary btn-sm mt-3">Register</a>
-    <input type="hidden" name="next" value="{{request.GET.next}}">
+
+    {% if request.GET.next %}
+    <input type="hidden" name="next" value="{{request.GET.next}}"/>
+    {% else %}
+    <input type="hidden" name="next" value="{% url 'project_home' %}"/>
+    {% endif %}
 </form>
 
 {% endblock content %}
