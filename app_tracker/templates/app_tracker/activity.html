@@ -36,6 +36,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><b>Total time:</b> {{activity.total_time}}</li>
                 </ul>
+                {% if user == activity.category.owner %}
                 <div class="card-footer d-inline-flex justify-content-end">
                     <!-- Edit activity -->
                     <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#edit-activity-Modal">
@@ -50,8 +51,10 @@
                         </svg>
                     </a>
                 </div>
+                {% endif %}
             </div>
 
+            {% if user == activity.category.owner %}
             <!-- Modal - Edit activity -->
             <div class="modal fade" id="edit-activity-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -88,7 +91,8 @@
                         </form>
                     </div>
                 </div>
-            </div>            
+            </div>
+            {% endif %}            
 
             <!-- Time interval -->
             {% if activity_all_logs %}
@@ -132,6 +136,7 @@
             <!-- Activity logs -->
             <div class="row d-flex justify-content-center">
                 
+                {% if user == activity.category.owner %}
                 <!-- Create log -->
                 <!-- Button - trigger modal -->
                 <div class="text-center">
@@ -169,6 +174,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
                 <div class="col-8">
 
@@ -180,7 +186,7 @@
                                     <th>Date</th>
                                     <th>Start time</th>
                                     <th>Logged time</th>
-                                    <th>Action</th>
+                                    {% if user == category.owner %}<th>Action</th>{% endif %}
                                 </tr>
                             </thead>   
             
@@ -191,6 +197,7 @@
                                         <td>{{log.date|date:'Y-m-d'}}</td>
                                         <td>{{log.start_time|time:"H:i"}}</td>
                                         <td>{{log.log_time}}</td>
+                                        {% if user == category.owner %}
                                         <td>
                                             <!-- Edit log -->
                                             <a href="{% url "app_tracker:timelog_edit" log.id %}" class="btn btn-sm btn-secondary me-1" >
@@ -205,6 +212,7 @@
                                                 </svg>
                                             </a>
                                         </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                             </tbody>                

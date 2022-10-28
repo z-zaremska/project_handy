@@ -32,6 +32,7 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><b>Total time:</b> {{category.total_time}}</li>
                 </ul>
+                {% if user == category.owner %}
                 <div class="card-footer d-inline-flex justify-content-end">
                     <!-- Edit category - trigger modal -->
                     <button type="button" class="btn btn-secondary btn-sm me-1" data-bs-toggle="modal" data-bs-target="#edit-category-Modal">
@@ -46,8 +47,10 @@
                         </svg>
                     </a>
                 </div>
+                {% endif %}
             </div>
 
+            {% if user == category.owner %}
             <!-- Edit category -->
             <!-- Modal - Edit category -->
             <div class="modal fade" id="edit-category-Modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -77,6 +80,7 @@
                     </div>
                 </div>
             </div>
+            {% endif %}
 
             <!-- Time interval -->
             {% if category_all_logs %}
@@ -119,7 +123,7 @@
             
             <!-- Category activities -->
             <div class="row d-flex justify-content-center">
-
+                {% if user == category.owner %}
                 <!-- Create activity -->
                 <!-- Button - trigger modal -->
                 <div class="text-center">
@@ -161,6 +165,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
 
                 <div class="col-8">
 

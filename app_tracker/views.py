@@ -1,6 +1,6 @@
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from app_tracker.models import Category, Activity, TimeLog
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
 from django.core.exceptions import ObjectDoesNotExist
@@ -46,10 +46,8 @@ def tracker_home(request):
 
 #Category
 
-@login_required
 def category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    check_category_owner(category, request)
     category_all_activities = Activity.objects.filter(category=category).all()
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
     
@@ -60,6 +58,7 @@ def category(request, category_id):
     
     # Multiple forms
     if request.method == 'POST':
+        check_category_owner(category, request)
         # create activity
         if request.POST.get("form_type") == 'create_activity_form':
             activity_form = ActivityForm(request.POST or None)
@@ -204,10 +203,8 @@ def category_delete(request, category_id):
 
 #Activity
 
-@login_required
 def activity(request, activity_id):
-    activity = get_object_or_404(Activity, pk=activity_id)
-    check_category_owner(activity.category, request)    
+    activity = get_object_or_404(Activity, pk=activity_id)   
     all_logs = TimeLog.objects.filter(activity=activity).all()
     
     # Chart data for Activity
@@ -278,6 +275,7 @@ def activity(request, activity_id):
 
     # Multiple forms
     if request.method == 'POST':
+        check_category_owner(activity.category, request) 
         # create time log
         if request.POST.get("form_type") == 'create_timelog_form':
             timelog_form = TimeLogForm(request.POST or None)     
