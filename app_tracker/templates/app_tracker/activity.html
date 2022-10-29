@@ -1,6 +1,8 @@
 {% extends 'base_app.html' %}
 {% load tracker_filters %}
 
+{% block title %}| Activity {{activity.name}}{% endblock title %}
+
 {% block navbar %}
 <!-- Link tree -->
 <a href="{% url 'app_tracker:tracker_home' %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">

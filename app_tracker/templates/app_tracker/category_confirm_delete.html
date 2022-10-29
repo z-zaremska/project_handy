@@ -1,5 +1,24 @@
 {% extends 'base_app.html' %}
 
+{% block title %}| Delete category {{category.name}}{% endblock title %}
+
+
+{% block navbar %}
+<!-- Link tree -->
+<a href="{% url 'app_tracker:tracker_home' %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">
+    | Activity tracker
+</a>
+<a href="{% url 'app_tracker:category' category.id %}" class="d-inline-flex nav-link text-align-middle my-auto me-1">
+    | {{category.name}}
+</a>
+<!-- Recent page -->
+<a href="" class="d-inline-flex align-items-center disabled"></a>
+    <p class="text-align-middle my-auto me-1">| Delete</p>   
+</a>
+
+{% endblock navbar %}
+
+
 {% block content %}
 <div class="col-6 d-flex justify-content-center mt-3">
     <div class="alert alert-danger" role="alert">
