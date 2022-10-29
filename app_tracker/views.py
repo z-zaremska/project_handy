@@ -81,21 +81,32 @@ def category(request, category_id):
       
     # Category data frame
     #---> adjusting data frame time interval
+    try:
+        first_log = category_all_logs.earliest('date', 'start_time').date
+        last_log = category_all_logs.latest('date', 'start_time').date
+        logging_period = pd.date_range(first_log, last_log)
+    except:
+        pass
+
     adjust_interval_start = request.GET.get('adjust_interval_start')
     adjust_interval_end = request.GET.get('adjust_interval_end')
     chart_interval_form = ChartTimeIntervalForm()
 
     if adjust_interval_start:
-        if adjust_interval_start == 'reset':
-            category_all_logs = category_all_logs            
+        if adjust_interval_start in logging_period:
+            category_all_logs = category_all_logs.filter(date__gte=adjust_interval_start)            
+        elif adjust_interval_start == 'reset':
+            category_all_logs = category_all_logs
         else:
-            category_all_logs = category_all_logs.filter(date__gte=adjust_interval_start)
+            pass
     if adjust_interval_end:
-        if adjust_interval_end == 'reset':
-            category_all_logs = category_all_logs            
+        if adjust_interval_end in logging_period:
+            category_all_logs = category_all_logs.filter(date__lte=adjust_interval_end)            
+        elif adjust_interval_end == 'reset':
+            category_all_logs = category_all_logs
         else:
-            category_all_logs = category_all_logs.filter(date__lte=adjust_interval_end)
-     
+            pass    
+
     try:
         interval_start = category_all_logs.earliest('date', 'start_time').date
         interval_end = category_all_logs.latest('date', 'start_time').date
@@ -155,7 +166,6 @@ def category(request, category_id):
         # for dates with no time log set 0
         date_index = pd.date_range(category_all_logs.earliest('date', 'start_time').date, category_all_logs.latest('date', 'start_time').date)
         cat_chart_df_in_hrs = cat_chart_df_in_hrs.reindex(date_index, fill_value=0)
-        print(cat_chart_df_in_hrs)
     except:
         pass
 
@@ -250,20 +260,31 @@ def activity(request, activity_id):
     
     # Activity data frame
     #---> adjusting data frame time interval
+    try:
+        first_log = all_logs.earliest('date', 'start_time').date
+        last_log = all_logs.latest('date', 'start_time').date
+        logging_period = pd.date_range(first_log, last_log)
+    except:
+        pass
+
     adjust_interval_start = request.GET.get('adjust_interval_start')
     adjust_interval_end = request.GET.get('adjust_interval_end')
     chart_interval_form = ChartTimeIntervalForm()
 
     if adjust_interval_start:
-        if adjust_interval_start == 'reset':
+        if adjust_interval_start in logging_period:
+            all_logs = all_logs.filter(date__gte=adjust_interval_start)
+        elif adjust_interval_start == 'reset':
             all_logs = all_logs
         else:
-            all_logs = all_logs.filter(date__gte=adjust_interval_start)
+            pass
     if adjust_interval_end:
-        if adjust_interval_end == 'reset':
-            all_logs = all_logs        
+        if adjust_interval_end in logging_period:
+            all_logs = all_logs.filter(date__lte=adjust_interval_end)        
+        elif adjust_interval_end == 'reset':
+            all_logs = all_logs
         else:
-            all_logs = all_logs.filter(date__lte=adjust_interval_end)
+            pass
      
     try:
         interval_start = all_logs.earliest('date', 'start_time').date
@@ -298,11 +319,7 @@ def activity(request, activity_id):
 
     # Activity chart - line
     # ---> independent data frame in hours for proper timedelta display on y-axis
-
-    #  /// idx = pd.date_range('09-01-2013', '09-30-2013')
-
     atv_chart_df_in_hrs = pd.Series(index=activity_page_df.index, name=f'Activity "{activity.name}"').to_frame()
-    print(atv_chart_df_in_hrs)
     try:
         atv_chart_df_in_hrs[f'Activity "{activity.name}"'] = activity_page_df[f'Activity "{activity.name}"'].dt.total_seconds()/3600
         # for dates with no time log set 0
@@ -310,8 +327,6 @@ def activity(request, activity_id):
         atv_chart_df_in_hrs = atv_chart_df_in_hrs.reindex(date_index, fill_value=0)      
     except:
         pass
-
-    print(atv_chart_df_in_hrs)
 
     #---> chart configuration
     fig = px.line(
