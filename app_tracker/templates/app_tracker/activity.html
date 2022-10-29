@@ -187,7 +187,7 @@
                                     <th>Date</th>
                                     <th>Start time</th>
                                     <th>Logged time</th>
-                                    {% if user == category.owner %}<th>Action</th>{% endif %}
+                                    {% if user == activity.category.owner %}<th>Action</th>{% endif %}
                                 </tr>
                             </thead>   
             
@@ -198,7 +198,7 @@
                                         <td>{{log.date|date:'Y-m-d'}}</td>
                                         <td>{{log.start_time|time:"H:i"}}</td>
                                         <td>{{log.log_time}}</td>
-                                        {% if user == category.owner %}
+                                        {% if user == activity.category.owner %}
                                         <td>
                                             <!-- Edit log -->
                                             <a href="{% url "app_tracker:timelog_edit" log.id %}" class="btn btn-sm btn-secondary me-1" >

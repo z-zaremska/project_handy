@@ -148,12 +148,16 @@ def category(request, category_id):
 
     # Category chart - line
     # ---> independent data frame in hours for proper timedelta display on y-axis
-    cat_chart_df_in_hrs = pd.Series(
-        index=category_page_df.index,
-        data=category_page_df[f'Category "{category.name}"'].dt.total_seconds()/3600,
-        name=f'Category "{category.name}"').to_frame()
-    for column in category_page_df.columns:
-        cat_chart_df_in_hrs[f"{column}"] = category_page_df[f"{column}"].dt.total_seconds()/3600
+    cat_chart_df_in_hrs = pd.Series(index=category_page_df.index, data=pd.NaT, name=f'Category "{category.name}"').to_frame()
+    try:
+        for column in category_page_df.columns:
+            cat_chart_df_in_hrs[f"{column}"] = category_page_df[f"{column}"].dt.total_seconds()/3600
+        # for dates with no time log set 0
+        date_index = pd.date_range(category_all_logs.earliest('date', 'start_time').date, category_all_logs.latest('date', 'start_time').date)
+        cat_chart_df_in_hrs = cat_chart_df_in_hrs.reindex(date_index, fill_value=0)
+        print(cat_chart_df_in_hrs)
+    except:
+        pass
 
     #---> chart configuration
     fig = px.line(
@@ -171,19 +175,18 @@ def category(request, category_id):
 
     fig.update_layout(
         xaxis=dict(title=None,showgrid=True, gridwidth=1, gridcolor='Lightgray', dtick='w', tickangle=70, tickformat = '%d.%m',),
-        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h',),
+        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h', zerolinecolor='Lightgray'),
         margin=dict(l=0, r=0, b=0, t=0),
         autosize=True,
         height=300,
         plot_bgcolor='white',
         hovermode=False,
         legend=dict(
+            orientation="h",
             yanchor="top",
-            y=0.99,
+            y=1.10,
             xanchor="left",
-            x=0.01,
-            bordercolor='black',
-            borderwidth=2,
+            x=0.00,
             title={'text': None})
         )
    
@@ -286,19 +289,29 @@ def activity(request, activity_id):
     y_activity_data = [log for log in activity_chart_data.values()]
 
         # data framne init - index = dates, column = activity, data = time logs
-    activity_page_df = pd.Series(index=x_activity_data, data=y_activity_data, name=f"Activity {activity.name}").to_frame()
+    activity_page_df = pd.Series(index=x_activity_data, data=y_activity_data, name=f'Activity "{activity.name}"').to_frame()
     activity_page_df.index.name = "Dates"
 
     # Total time for activity
-    activity.total_time = activity_page_df[f"Activity {activity.name}"].sum()
+    activity.total_time = activity_page_df[f'Activity "{activity.name}"'].sum()
 
 
     # Activity chart - line
     # ---> independent data frame in hours for proper timedelta display on y-axis
-    atv_chart_df_in_hrs = pd.Series(
-        index=activity_page_df.index,
-        data=activity_page_df[f"Activity {activity.name}"].dt.total_seconds()/3600,
-        name=f"Activity {activity.name}").to_frame()
+
+    #  /// idx = pd.date_range('09-01-2013', '09-30-2013')
+
+    atv_chart_df_in_hrs = pd.Series(index=activity_page_df.index, name=f'Activity "{activity.name}"').to_frame()
+    print(atv_chart_df_in_hrs)
+    try:
+        atv_chart_df_in_hrs[f'Activity "{activity.name}"'] = activity_page_df[f'Activity "{activity.name}"'].dt.total_seconds()/3600
+        # for dates with no time log set 0
+        date_index = pd.date_range(all_logs.earliest('date', 'start_time').date, all_logs.latest('date', 'start_time').date)
+        atv_chart_df_in_hrs = atv_chart_df_in_hrs.reindex(date_index, fill_value=0)      
+    except:
+        pass
+
+    print(atv_chart_df_in_hrs)
 
     #---> chart configuration
     fig = px.line(
@@ -313,7 +326,7 @@ def activity(request, activity_id):
 
     fig.update_layout(
         xaxis=dict(title=None,showgrid=True, gridwidth=1, gridcolor='Lightgray', dtick='d', tickangle=70, tickformat = '%d.%m',),
-        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h'),
+        yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h', zerolinecolor='Lightgray'),
         margin=dict(l=0, r=0, b=0, t=0),
         autosize=True,
         height=300,
@@ -321,11 +334,6 @@ def activity(request, activity_id):
         hovermode=False,
         showlegend=False,
     )
-
-    # fig.update_xaxes(
-    #     dtick="M1",
-    #     tickformat="%b\n%Y"
-    # )
     
     activity_chart = fig.to_html(config = {'displayModeBar': False},)
     

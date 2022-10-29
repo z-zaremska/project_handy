@@ -19,11 +19,9 @@
         <div class="col-md">
             <h4 class="display-6">Your categories</h4>
             {% if all_categories %}
-                <ul class="list-unstyled">
                 {% for category in all_categories %}
-                    <li><a href="{% url 'app_tracker:category' category.id %}">{{category.name}}</a></li>
+                    <a href="{% url 'app_tracker:category' category.id %}" class="btn btn-dark my-1" style="width: 250px">{{category.name}}</a><br>
                 {% endfor %}
-                </ul>
             {% endif %}
 
             <hr>
