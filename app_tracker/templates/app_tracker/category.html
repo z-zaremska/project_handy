@@ -1,4 +1,5 @@
 {% extends 'base_app.html' %}
+{% load tracker_filters %}
 
 
 {% block navbar %}
@@ -30,7 +31,7 @@
                     <p class="card-text">{{category.description}}</p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><b>Total time:</b> {{category.total_time}}</li>
+                    <li class="list-group-item"><b>Total time:</b> {{category.total_time|td_format}}</li>
                 </ul>
                 {% if user == category.owner %}
                 <div class="card-footer d-inline-flex justify-content-end">
@@ -115,8 +116,8 @@
             <!-- Chart -->
             {% if category_all_logs %}
     
-                {{category_chart|safe}}
-                <p class="text-small">({{interval_start}} - {{interval_end}})</p>
+                {{category_chart|safe}}<br>
+                <p class="text-small mt-2"><i>({{interval_start}} - {{interval_end}})</i></p>
 
             {% endif %}
             </div>            
@@ -189,7 +190,7 @@
                                         <td style="color: {{activity.color}}">{{activity.color}}</td>
                                         <td>
                                             {% if activity.total_time %}
-                                                {{activity.total_time}}
+                                                {{activity.total_time|td_format}}
                                             {% else %}
                                             -
                                             {% endif %}

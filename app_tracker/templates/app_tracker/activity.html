@@ -1,4 +1,5 @@
 {% extends 'base_app.html' %}
+{% load tracker_filters %}
 
 {% block navbar %}
 <!-- Link tree -->
@@ -34,7 +35,7 @@
                     <li class="list-group-item"><b>Category:</b> <a href="{% url 'app_tracker:category' activity.category.id %}">{{activity.category}}</a></li>
                 </ul>
                 <ul class="list-group list-group-flush">
-                    <li class="list-group-item"><b>Total time:</b> {{activity.total_time}}</li>
+                    <li class="list-group-item"><b>Total time:</b> {{activity.total_time|td_format}}</li>
                 </ul>
                 {% if user == activity.category.owner %}
                 <div class="card-footer d-inline-flex justify-content-end">
@@ -127,8 +128,8 @@
             <!-- Chart -->
             {% if activity_all_logs %}
     
-                {{activity_chart|safe}}
-                <p class="text-small">({{interval_start}} - {{interval_end}})</p>
+                {{activity_chart|safe}}<br>
+                <p class="text-small mt-2"><i>({{interval_start}} - {{interval_end}})</i></p>
 
             {% endif %}
             </div>            
