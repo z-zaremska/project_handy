@@ -1,1 +1,1 @@
-web: gunicorn project_handy.wsgi
+web: gunicorn 'project_handy.wsgi'
