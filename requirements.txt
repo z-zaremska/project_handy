@@ -1,4 +1,4 @@
-﻿asgiref==3.5.2
+asgiref==3.5.2
 beautifulsoup4==4.11.1
 dj-database-url==1.0.0
 Django==4.1.1
