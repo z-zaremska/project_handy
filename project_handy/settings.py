@@ -26,9 +26,9 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = config('DEBUG', cast=bool)
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['.localhost']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -134,6 +134,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -145,12 +148,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # My settings
 LOGIN_URL = 'users:login'
-
-# Heroku settings
-# import django_heroku
-# django_heroku.settings(locals())
-
-# if os.environ.get('DEBUG') == 'TRUE':
-#     DEBUG = True
-# elif os.environ.get('DEBUG') == 'FALSE':
-#     DEBUG = False
