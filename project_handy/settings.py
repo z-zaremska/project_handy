@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'app_tracker.apps.AppTrackerConfig',
     'bootstrap5',
     'users',
+    'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
 
     
