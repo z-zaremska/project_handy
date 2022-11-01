@@ -36,9 +36,10 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     #my apps
     'app_tracker.apps.AppTrackerConfig',
+    'whitenoise.runserver_nostatic',
     'bootstrap5',
     'users',
-    'whitenoise.runserver_nostatic',
+    
 
     
     #default apps
@@ -134,7 +135,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
