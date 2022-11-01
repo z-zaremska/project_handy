@@ -29,6 +29,7 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://project-handy.up.railway.app']
 
 
 # Application definition
