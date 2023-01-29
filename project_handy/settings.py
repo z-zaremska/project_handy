@@ -95,19 +95,16 @@ WSGI_APPLICATION = 'project_handy.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = {
+DATABASES={
     'default': {
-        # 'ENGINE': 'django.db.backends.sqlite3',
-        # 'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'railway',
         'USER': 'postgres',
-        'PASSWORD': 'E0kUQewugfg8duZHlkpD',
-        'HOST': 'containers-us-west-46.railway.app',
-        'PORT': '5651',
+        'PASSWORD': config("PGPASSWORD"),
+        'HOST': 'containers-us-west-136.railway.app',
+        'PORT': '6783',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
