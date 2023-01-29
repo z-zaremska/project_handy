@@ -3,7 +3,7 @@ from django.utils import timezone
 from datetime import timedelta, date
 from django.contrib.auth.models import User
 
-#Choices
+# Choices
 COLOR_THEME_CHOICES = [
     ('gray', 'gray'),
     ('yellow', 'yellow'),
@@ -15,6 +15,8 @@ COLOR_THEME_CHOICES = [
 ]
 
 # Models
+
+
 class Category(models.Model):
     name = models.CharField(max_length=30, default="category name", unique=True)
     description = models.CharField(max_length=100, default="category description")
