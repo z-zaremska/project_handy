@@ -182,9 +182,8 @@ def category(request, category_id):
     fig = px.line(
         cat_chart_df_in_hrs,
         markers=True,
-        line_shape="spline",
+        #line_shape="spline",
         color_discrete_sequence=colors,
-        title=None,
     )
 
     fig.update_traces(
@@ -193,7 +192,7 @@ def category(request, category_id):
     )
 
     fig.update_layout(
-        xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', dtick='w', tickangle=70,
+        xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', tickangle=0,
                    tickformat='%d.%m', ),
         yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h',
                    zerolinecolor='Lightgray'),
@@ -349,14 +348,13 @@ def activity(request, activity_id):
         atv_chart_df_in_hrs,
         markers=True,
         line_shape="spline",
-        color_discrete_sequence=[activity.color],
-        title=None,
+        color_discrete_sequence=[activity.color]
     )
 
     fig.update_traces(connectgaps=True)
 
     fig.update_layout(
-        xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', dtick='d', tickangle=70,
+        xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', tickangle=0,
                    tickformat='%d.%m', ),
         yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h',
                    zerolinecolor='Lightgray'),

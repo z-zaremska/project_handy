@@ -10,8 +10,7 @@
 </a>
 <!-- Recent page -->
 <a href="{% url 'app_tracker:category' category.id %}" class="d-inline-flex align-items-center disabled"></a>
-    <p class="text-align-middle my-auto me-1">| {{category.name}}</p>   
-</a>
+    <p class="text-align-middle my-auto me-1">| {{category.name}}</p>
 
 {% endblock navbar %}
 
@@ -116,12 +115,12 @@
             <div class="row text-center">
             <!-- Chart -->
             {% if category_all_logs %}
-    
+
                 {{category_chart|safe}}<br>
                 <p class="text-small mt-2"><i>({{interval_start}} - {{interval_end}})</i></p>
 
             {% endif %}
-            </div>            
+            </div>
             
             <!-- Category activities -->
             <div class="row d-flex justify-content-center">
