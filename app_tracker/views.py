@@ -4,9 +4,7 @@ from django.contrib.auth.decorators import login_required
 from app_tracker.models import Category, Activity, TimeLog
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
 from django.core.exceptions import ObjectDoesNotExist
-from collections import defaultdict
 from django.contrib import messages
-from datetime import timedelta
 import pandas as pd
 import plotly.express as px
 from sqlalchemy import create_engine
@@ -63,9 +61,7 @@ def category(request, category_id):
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
 
     # Activities colors for chart
-    colors = ['red']  # default category color
-    for activity in category_all_activities:
-        colors.append(activity.color)
+    colors = [activity.color for activity in category_all_activities]
 
     # Multiple forms
     if request.method == 'POST':
@@ -126,74 +122,35 @@ def category(request, category_id):
         interval_end = None
 
     # ---> page data frame
-    # all possible dates in category
-    all_dates = []
-    for log in category_all_logs:
-        if log.date not in all_dates:
-            all_dates.append(log.date)
-
-        # data frame init - index = dates, column = category, data = empty,
-    category_page_df = pd.Series(index=all_dates, data=pd.NaT, name=f'Category "{category.name}"').to_frame()
-
-    # import activities data from Activity model instances
-    for activity in category_all_activities:
-        activity_logs_dates = [log.date for log in TimeLog.objects.filter(activity=activity)]
-        activity_logs_time = [log.log_time for log in TimeLog.objects.filter(activity=activity)]
-        activity_chart_data = defaultdict(timedelta)
-        # sum of timedelta with same date
-        for date, log in zip(activity_logs_dates, activity_logs_time):
-            if date in activity_chart_data:
-                activity_chart_data[date] += log
-            else:
-                activity_chart_data[date] = log
-
-            # cleaned data for data frame
-        x_activity_data = [date for date in activity_chart_data.keys()]
-        y_activity_data = [log for log in activity_chart_data.values()]
-        # activity series
-        activity_data = pd.Series(index=x_activity_data, data=y_activity_data)
-        # add activity series to data frame
-        category_page_df[f'Activity "{activity.name}"'] = activity_data
-
-    category_page_df.index.name = "Dates"
-    category_page_df = category_page_df.fillna(timedelta(0))
-    category_page_df[f'Category "{category.name}"'] = category_page_df.iloc[:, 1:].sum(
-        axis=1)  # category data = sum of all activities
+    category_timelogs_sql = f"""
+    SELECT att.id, att.date, att.log_time, att.start_time, ata.name AS activity_name
+    FROM app_tracker_timelog att
+    JOIN app_tracker_activity ata 
+    ON att.activity_id = ata.id
+    JOIN app_tracker_category atc 
+    ON atc.id = ata.category_id
+    WHERE atc.name = '{category.name}';
+    """
+    category_page_df = pd.read_sql(category_timelogs_sql, engine)
+    category_page_df["log_time_h"] = category_page_df.log_time.dt.total_seconds() / 3600
 
     # Total time for category and activity
-    category.total_time = category_page_df[f'Category "{category.name}"'].sum()
+    category.total_time = category_page_df.log_time.sum()
     for activity in category_all_activities:
-        activity.total_time = category_page_df[f'Activity "{activity.name}"'].sum()
+        activity.total_time = category_page_df.groupby("activity_name").log_time.sum().loc[activity.name]
         try:
             activity.last_log = activity.all_logs.latest('date', 'start_time')
+            # category_page_df.loc[category_page_df.activity_name == activity.name, ["date", "start_time"]].max()
         except ObjectDoesNotExist:
             pass
 
     # Category chart - line
-    # ---> independent data frame in hours for proper timedelta display on y-axis
-    cat_chart_df_in_hrs = pd.Series(index=category_page_df.index, data=pd.NaT,
-                                    name=f'Category "{category.name}"').to_frame()
-    try:
-        for column in category_page_df.columns:
-            cat_chart_df_in_hrs[f"{column}"] = category_page_df[f"{column}"].dt.total_seconds() / 3600
-        # for dates with no time log set 0
-        date_index = pd.date_range(category_all_logs.earliest('date', 'start_time').date,
-                                   category_all_logs.latest('date', 'start_time').date)
-        cat_chart_df_in_hrs = cat_chart_df_in_hrs.reindex(date_index, fill_value=0)
-    except:
-        pass
-
     # ---> chart configuration
-    fig = px.line(
-        cat_chart_df_in_hrs,
-        markers=True,
-        #line_shape="spline",
+    fig = px.bar(
+        x=category_page_df.date,
+        y=category_page_df.log_time_h,
+        color=category_page_df.activity_name,
         color_discrete_sequence=colors,
-    )
-
-    fig.update_traces(
-        connectgaps=True,
-        line=dict(dash='dash', width=4), selector=({'name': f'Category "{category.name}"'}),
     )
 
     fig.update_layout(
