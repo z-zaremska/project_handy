@@ -9,6 +9,11 @@ from django.contrib import messages
 from datetime import timedelta
 import pandas as pd
 import plotly.express as px
+from sqlalchemy import create_engine
+from decouple import config
+
+# create connection to PostgreSQL database
+engine = create_engine(config('DATABASE_URL'))
 
 
 # FUNCTIONS
@@ -271,7 +276,7 @@ def activity(request, activity_id):
                 messages.success(request, "Activity has been updated!")
                 return redirect('app_tracker:activity', activity.pk)
 
-                # Activity data frame
+    # Activity data frame
     # ---> adjusting data frame time interval
     try:
         first_log = all_logs.earliest('date', 'start_time').date
@@ -307,51 +312,26 @@ def activity(request, activity_id):
         interval_end = None
 
     # ---> page data frame
-    # import logs data connected to Activity
-    activity_logs_dates = [log.date for log in all_logs]
-    activity_logs_time = [log.log_time for log in all_logs]
-    activity_chart_data = defaultdict(timedelta)
-    # sum of timedelta with same date
-    for date, log in zip(activity_logs_dates, activity_logs_time):
-        if date in activity_chart_data:
-            activity_chart_data[date] += log
-        else:
-            activity_chart_data[date] = log
+    activity_logs_sql = f"""
+    SELECT att.id, att.date, att.log_time, att.start_time
+    FROM app_tracker_timelog att
+    JOIN app_tracker_activity ata 
+    ON att.activity_id = ata.id
+    WHERE ata.name = '{activity.name}';
+    """
+    activity_page_df = pd.read_sql(activity_logs_sql, engine)
+    activity_page_df["log_time_h"] = activity_page_df.log_time.dt.total_seconds() / 3600
 
-    # cleaned data for data frame
-    x_activity_data = [date for date in activity_chart_data.keys()]
-    y_activity_data = [log for log in activity_chart_data.values()]
-
-    # data frame init - index = dates, column = activity, data = time logs
-    activity_page_df = pd.Series(index=x_activity_data, data=y_activity_data,
-                                 name=f'Activity "{activity.name}"').to_frame()
-    activity_page_df.index.name = "Dates"
 
     # Total time for activity
-    activity.total_time = activity_page_df[f'Activity "{activity.name}"'].sum()
+    activity.total_time = activity_page_df.log_time.sum()
 
-    # Activity chart - line
-    # ---> independent data frame in hours for proper timedelta display on y-axis
-    atv_chart_df_in_hrs = pd.Series(index=activity_page_df.index, name=f'Activity "{activity.name}"').to_frame()
-    try:
-        atv_chart_df_in_hrs[f'Activity "{activity.name}"'] = activity_page_df[
-                                                                 f'Activity "{activity.name}"'].dt.total_seconds()/3600
-        # for dates with no time log set 0
-        date_index = pd.date_range(all_logs.earliest('date', 'start_time').date,
-                                   all_logs.latest('date', 'start_time').date)
-        atv_chart_df_in_hrs = atv_chart_df_in_hrs.reindex(date_index, fill_value=0)
-    except:
-        pass
-
+    # Activity chart - bar
     # ---> chart configuration
-    fig = px.line(
-        atv_chart_df_in_hrs,
-        markers=True,
-        line_shape="spline",
+    fig = px.bar(
+        activity_page_df.groupby("date").log_time_h.sum(),
         color_discrete_sequence=[activity.color]
     )
-
-    fig.update_traces(connectgaps=True)
 
     fig.update_layout(
         xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', tickangle=0,
