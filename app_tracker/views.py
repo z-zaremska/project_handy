@@ -92,7 +92,7 @@ def category(request, category_id):
         first_log = category_all_logs.earliest('date', 'start_time').date
         last_log = category_all_logs.latest('date', 'start_time').date
         logging_period = pd.date_range(first_log, last_log)
-    except:
+    except ObjectDoesNotExist:
         pass
 
     adjust_interval_start = request.GET.get('adjust_interval_start')
@@ -144,7 +144,7 @@ def category(request, category_id):
         except ObjectDoesNotExist:
             pass
 
-    # Mean amout of hours logged per day
+    # Mean amount of hours logged per day
     mean_per_day = category_page_df.log_time.sum() / len(category_page_df.date.unique())
     # Top activity
     top_activity = category_page_df.groupby("activity_name").log_time.sum().sort_values().index[-1]
@@ -184,7 +184,7 @@ def category(request, category_id):
             title={'text': None})
     )
 
-    category_chart = fig.to_html(config={'displayModeBar': False}, )
+    category_chart = fig.to_html(config={'displayModeBar': False})
 
     # Context
     context = {
@@ -253,7 +253,7 @@ def activity(request, activity_id):
         first_log = all_logs.earliest('date', 'start_time').date
         last_log = all_logs.latest('date', 'start_time').date
         logging_period = pd.date_range(first_log, last_log)
-    except:
+    except ObjectDoesNotExist:
         pass
 
     adjust_interval_start = request.GET.get('adjust_interval_start')
@@ -292,7 +292,6 @@ def activity(request, activity_id):
     """
     activity_page_df = pd.read_sql(activity_logs_sql, engine)
     activity_page_df["log_time_h"] = activity_page_df.log_time.dt.total_seconds() / 3600
-
 
     # Total time for activity
     activity.total_time = activity_page_df.log_time.sum()
