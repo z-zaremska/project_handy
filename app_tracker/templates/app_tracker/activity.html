@@ -38,6 +38,9 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item"><b>Total time:</b> {{activity.total_time|td_format}}</li>
                 </ul>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><b>Total time logs:</b> {{activity_all_logs|length}}</li>
+                </ul>
                 {% if user == activity.category.owner %}
                 <div class="card-footer d-inline-flex justify-content-end">
                     <!-- Edit activity -->
