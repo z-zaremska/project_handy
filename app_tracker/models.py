@@ -12,6 +12,15 @@ COLOR_THEME_CHOICES = [
     ('blue', 'blue'),
     ('green', 'green'),
     ('black', 'black'),
+    ('maroon', 'maroon'),
+    ('fuchsia', 'fuchsia'),
+    ('lime', 'lime'),
+    ('navy', 'navy'),
+    ('blueviolet', 'blueviolet'),
+    ('cadetblue', 'cadetblue'),
+    ('gold', 'gold'),
+    ('indigo', 'indigo'),
+    ('palevioletred', 'palevioletred'),
 ]
 
 # Models

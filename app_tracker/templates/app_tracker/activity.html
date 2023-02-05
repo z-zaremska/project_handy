@@ -76,13 +76,9 @@
                                     <label class="input-group-text" for="inputGroupSelect01">Color</label>
                                     <select class="form-select" name="color" id="inputGroupSelect01">
                                         <option selected="{{activity.color}}">{{activity.color}}</option>
-                                        <option value="gray">gray</option>
-                                        <option value="yellow">yellow</option>
-                                        <option value="purple">purple</option>
-                                        <option value="orange">orange</option>
-                                        <option value="blue">blue</option>
-                                        <option value="green">green</option>
-                                        <option value="black">black</option>
+                                        {% for color in colors_list %}
+                                            <option value={{color}}>{{color}}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>

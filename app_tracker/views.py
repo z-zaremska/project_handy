@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
-from app_tracker.models import Category, Activity, TimeLog
+from app_tracker.models import Category, Activity, TimeLog, COLOR_THEME_CHOICES
 from app_tracker.forms import TimeLogForm, ActivityForm, CategoryForm, ChartTimeIntervalForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import messages
@@ -316,6 +316,7 @@ def activity(request, activity_id):
         'interval_start': interval_start,
         'interval_end': interval_end,
         'activity_page_df': activity_page_df,
+        'colors_list': [color[0] for color in COLOR_THEME_CHOICES],
     }
 
     return render(request, 'app_tracker/activity.html', context)
