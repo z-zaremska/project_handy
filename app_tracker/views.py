@@ -144,6 +144,11 @@ def category(request, category_id):
         except ObjectDoesNotExist:
             pass
 
+    # Mean amout of hours logged per day
+    mean_per_day = category_page_df.log_time.sum() / len(category_page_df.date.unique())
+    # Top activity
+    top_activity = category_page_df.groupby("activity_name").log_time.sum().sort_values().index[-1]
+
     # Category chart - line
     # ---> chart configuration
     fig = px.bar(
@@ -151,6 +156,13 @@ def category(request, category_id):
         y=category_page_df.log_time_h,
         color=category_page_df.activity_name,
         color_discrete_sequence=colors,
+    )
+
+    fig.add_hline(
+        y=mean_per_day,
+        line_width=2,
+        line_dash="dash",
+        line_color="red",
     )
 
     fig.update_layout(
@@ -185,6 +197,8 @@ def category(request, category_id):
         'interval_start': interval_start,
         'interval_end': interval_end,
         'chart_interval_form': chart_interval_form,
+        'mean_per_day': mean_per_day,
+        'top_activity': top_activity,
     }
 
     return render(request, 'app_tracker/category.html', context)
