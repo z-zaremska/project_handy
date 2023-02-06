@@ -26,7 +26,7 @@ SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = config('DEBUG', cast=bool)
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://project-handy.up.railway.app']
@@ -37,6 +37,7 @@ CSRF_TRUSTED_ORIGINS = ['https://project-handy.up.railway.app']
 INSTALLED_APPS = [
     #my apps
     'app_tracker.apps.AppTrackerConfig',
+    'app_weather.apps.AppWeatherConfig',
     'whitenoise.runserver_nostatic',
     'bootstrap5',
     'users',

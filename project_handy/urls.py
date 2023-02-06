@@ -30,6 +30,8 @@ urlpatterns = [
     path('resume', ResumeTemplateView.as_view(), name='resume'),    
     #localhost:800/tracker/
     path('tracker/', include('app_tracker.urls')),
+    # localhost:800/weather/
+    path('weather/', include('app_weather.urls')),
     #localhost:800/users/
     path('users/', include('django.contrib.auth.urls')),    
     path('users/', include('users.urls')),
