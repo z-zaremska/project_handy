@@ -113,6 +113,13 @@
                 </div>
             {% endif %}
 
+            <!-- Category pie chart -->
+            {% if category_all_logs %}
+                <div class="mt-4">
+                    {{category_pie|safe}}
+                </div>
+            {% endif %}
+
         </div>            
     
         <!-- Right side -->

@@ -61,7 +61,7 @@ def category(request, category_id):
     category_all_logs = TimeLog.objects.filter(activity__in=category_all_activities)
 
     # Activities colors for chart
-    colors = [activity.color for activity in category_all_activities]
+    colors = {f'{activity.name}': f'{activity.color}' for activity in category_all_activities}
 
     # Multiple forms
     if request.method == 'POST':
@@ -123,7 +123,7 @@ def category(request, category_id):
 
     # ---> page data frame
     category_timelogs_sql = f"""
-    SELECT att.id, att.date, att.log_time, att.start_time, ata.name AS activity_name
+    SELECT att.id, att.date, att.log_time, att.start_time, ata.color, ata.name AS activity_name
     FROM app_tracker_timelog att
     JOIN app_tracker_activity ata 
     ON att.activity_id = ata.id
@@ -149,23 +149,18 @@ def category(request, category_id):
     # Top activity
     top_activity = category_page_df.groupby("activity_name").log_time.sum().sort_values().index[-1]
 
-    # Category chart - line
-    # ---> chart configuration
-    fig = px.bar(
+    # Category charts
+    # bar chart
+    fig_bar = px.bar(
         x=category_page_df.date,
         y=category_page_df.log_time_h,
         color=category_page_df.activity_name,
-        color_discrete_sequence=colors,
+        color_discrete_map=colors,
     )
 
-    fig.add_hline(
-        y=mean_per_day,
-        line_width=2,
-        line_dash="dash",
-        line_color="red",
-    )
+    fig_bar.add_hline(y=mean_per_day, line_width=2, line_dash="dash", line_color="red")
 
-    fig.update_layout(
+    fig_bar.update_layout(
         xaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', tickangle=0,
                    tickformat='%d.%m', ),
         yaxis=dict(title=None, showgrid=True, gridwidth=1, gridcolor='Lightgray', ticksuffix='h',
@@ -184,13 +179,35 @@ def category(request, category_id):
             title={'text': None})
     )
 
-    category_chart = fig.to_html(config={'displayModeBar': False})
+    # pie chart
+    fig_pie = px.pie(
+        values=category_page_df.groupby("activity_name").log_time.sum(),
+        names=category_page_df.groupby("activity_name").log_time.sum().index,
+        hole=0.3,
+    )
+
+    fig_pie.update_traces(
+        textposition='inside',
+        textinfo='percent+label',
+        marker=dict(colors=category_page_df.groupby("activity_name").color.first()),
+    )
+    fig_pie.update_layout(
+        showlegend=False,
+        margin=dict(l=0, r=0, b=0, t=0),
+        autosize=True,
+        height=250,
+        hovermode=False,
+    )
+
+    category_chart = fig_bar.to_html(config={'displayModeBar': False})
+    category_pie = fig_pie.to_html(config={'displayModeBar': False})
 
     # Context
     context = {
         'category': category,
         'category_all_activities': category_all_activities,
         'category_chart': category_chart,
+        'category_pie': category_pie,
         'category_all_logs': category_all_logs,
         'adjust_interval_start': adjust_interval_start,
         'adjust_interval_end': adjust_interval_end,
