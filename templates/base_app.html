@@ -7,7 +7,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Project handy {% block title %}{% endblock title %}</title>
         <!-- Bootstrap core CSS -->
-        <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+        {% block core %}
+<!--        <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">-->
+        {% endblock core %}
         <!-- Custom styles for this template -->
         <link href="{% static 'bootstrap/css/headers.css' %}" rel="stylesheet">
 
