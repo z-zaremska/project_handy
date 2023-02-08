@@ -6,12 +6,15 @@ import json
 
 def weather_home(request):
 
+    # TODO: maybe geolocation?
     city = "Gdansk"
 
     if request.method == "POST":
         city = request.POST['city'].title()
 
-    api_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric$appid={config('WEATHER_API_KEY')}"
+
+    #"api.openweathermap.org/data/2.5/forecast/daily?lat={lat}&lon={lon}&cnt={cnt}&appid={config('WEATHER_API_KEY')}&units=metric&lang=en"
+    api_url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid="
     source = urllib.request.urlopen(api_url).read()
     weather_data = json.loads(source)
 
@@ -30,6 +33,7 @@ def weather_home(request):
         "visibility": weather_data['visibility'],
         "wind_speed": weather_data['wind']['speed'],
         "clouds": weather_data['clouds']['all'],
+        "dt": weather_data['dt'],
     }
 
     return render(request, 'app_weather/weather_home.html', context)
