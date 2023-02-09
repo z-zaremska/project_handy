@@ -7,7 +7,7 @@ import json
 def weather_home(request):
 
     # TODO: maybe geolocation?
-    city = "Krakow"
+    city = "Gdansk"
 
     if request.method == "POST":
         city = request.POST['city'].title()

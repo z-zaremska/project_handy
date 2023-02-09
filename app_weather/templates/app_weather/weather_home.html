@@ -13,49 +13,52 @@
 
 {% block content %}
 
-
 <div class="col mx-auto py-md-4">
+    <!--City search-->
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" placeholder="Enter city name" name="city"/>
+        <button type="submit">Go</button>
+    </form>
     <!-- Weather forecast -->
     <div class="card">
-        <h1 class="card-header text-center bg-dark text-white">
-            <svg class="bi" width="45" height="45"><use xlink:href="#bi-geo-alt"/></svg>
+        <h3 class="card-header text-center bg-dark text-white">
+            <svg class="bi" width="35" height="35"><use xlink:href="#bi-geo-alt"/></svg>
             {{name}} ({{country_code}})
-        </h1>
+        </h3>
         <!--5 days forecast-->
         <div class="card-body text-center">
-            <p class="row card-text">
-                <div class="row align-items-md-stretch">
-                    <!--Today-->
-                    <div class="col-3 p-3 bg-primary">
-                        <p class="lead">today</p>
-                        <hr>
-                        <h2>weather icon: {{ today_forecast.weather.0.icon }}</h2>
-                        <p class="lead">{{ today_forecast.weather.0.description }}</p>
-                        <h1 class="display-4">{{ today_forecast.main.temp }}°C</h1>
-                        <p><small>
-                            max: {{ today_forecast.main.temp_max }}°C<br>
-                            min: {{ today_forecast.main.temp_min }}°C<br>
-                            clouds: {{ today_forecast.clouds.all }}%<br>
-                            wind speed: {{ today_forecast.wind.speed }}<br>
-                            humidity: {{ today_forecast.main.humidity }}%
-                        </small></p>
-                    </div>
-                    <!-- next day -->
-                    {% for day in next_days_forecast %}
-                    <div class="col p-3 bg-dark border">
-                        <p class="lead">next</p>
-                        <hr>
-                        <h4>weather icon: {{ day.weather.0.icon }}</h4>
-                        <p class="lead">{{ day.weather.0.description }}</p>
-                        <h1 class="display-6">{{ day.main.temp }}°C</h1>
-                        <p><small>
-                            max: {{ day.main.temp_max }}°C<br>
-                            min: {{ day.main.temp_min }}°C
-                        </small></p>
-                    </div>
-                    {% endfor %}
+            <div class="row align-items-md-stretch">
+                <!--Today-->
+                <div class="col-3 p-3 bg-primary">
+                    <p class="lead">{{ today_forecast.dt }}</p>
+                    <hr>
+                    <img src="http://openweathermap.org/img/w/{{ today_forecast.weather.0.icon }}.png" width="100"/>
+                    <p class="lead">{{ today_forecast.weather.0.description }}</p>
+                    <h1 class="display-4">{{ today_forecast.main.temp }}°C</h1>
+                    <p><small>
+                        max: {{ today_forecast.main.temp_max }}°C<br>
+                        min: {{ today_forecast.main.temp_min }}°C<br>
+                        clouds: {{ today_forecast.clouds.all }}%<br>
+                        wind speed: {{ today_forecast.wind.speed }}<br>
+                        humidity: {{ today_forecast.main.humidity }}%
+                    </small></p>
                 </div>
-            </p>
+                <!-- next day -->
+                {% for day in next_days_forecast %}
+                <div class="col p-3 bg-dark border">
+                    <p class="lead">{{ day.dt }}</p>
+                    <hr>
+                    <img src="http://openweathermap.org/img/w/{{ day.weather.0.icon }}.png" width=100/>
+                    <p class="lead">{{ day.weather.0.description }}</p>
+                    <h1 class="display-6">{{ day.main.temp }}°C</h1>
+                    <p><small>
+                        max: {{ day.main.temp_max }}°C<br>
+                        min: {{ day.main.temp_min }}°C
+                    </small></p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </div>
