@@ -4,7 +4,7 @@
 
 {% block navbar %}
 
-<a href="{% url 'project_home' %}" class="d-inline-flex align-items-center disabled"></a>
+<a href="{% url 'project_home' %}" class="d-inline-flex align-items-center disabled">
     <p class="text-align-middle my-auto me-1">| Weather forecast</p>
 </a>
 
@@ -15,89 +15,49 @@
 
 
 <div class="col mx-auto py-md-4">
-
-    <div>
-        <!-- Weather forecast -->
-        <div class="card">
-            <h5 class="card-header text-center bg-dark text-white display-6">
-                <svg class="bi" width="45" height="45"><use xlink:href="#bi-geo-alt"/></svg>
-                {{name}} ({{country_code}})
-            </h5>
-            <!--7 days forecast-->
-            <div class="card-body text-center">
-                <p class="card-text">
-
-
-                    <div class="row align-items-md-stretch">
-                        <!--Today-->
-                        <div class="col-3 p-3 bg-primary">
-                            <h6>{{dt}}</h6>
-                            <hr>
-                            <p>
-                                {{main}}<br>
-                                <i>({{description}})</i><br><br>
-                                {{temp}}°C<br>
-                                (min: {{temp_min}}°C | max: {{temp_max}}°C)
-                            </p>
-                        </div>
-                        <!-- 2nd day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>2nd day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
-                        <!-- 3rd day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>3rd day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
-                        <!-- 4th day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>4th day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
-                        <!-- 5th day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>5th day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
-                        <!-- 6th day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>6th day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
-                        <!-- 7th day -->
-                        <div class="col p-3 bg-dark border">
-                            <h6>7th day</h6>
-                            <hr>
-                            <p>
-                                some statistics
-                            </p>
-                        </div>
+    <!-- Weather forecast -->
+    <div class="card">
+        <h1 class="card-header text-center bg-dark text-white">
+            <svg class="bi" width="45" height="45"><use xlink:href="#bi-geo-alt"/></svg>
+            {{name}} ({{country_code}})
+        </h1>
+        <!--5 days forecast-->
+        <div class="card-body text-center">
+            <p class="row card-text">
+                <div class="row align-items-md-stretch">
+                    <!--Today-->
+                    <div class="col-3 p-3 bg-primary">
+                        <p class="lead">today</p>
+                        <hr>
+                        <h2>weather icon: {{ today_forecast.weather.0.icon }}</h2>
+                        <p class="lead">{{ today_forecast.weather.0.description }}</p>
+                        <h1 class="display-4">{{ today_forecast.main.temp }}°C</h1>
+                        <p><small>
+                            max: {{ today_forecast.main.temp_max }}°C<br>
+                            min: {{ today_forecast.main.temp_min }}°C<br>
+                            clouds: {{ today_forecast.clouds.all }}%<br>
+                            wind speed: {{ today_forecast.wind.speed }}<br>
+                            humidity: {{ today_forecast.main.humidity }}%
+                        </small></p>
                     </div>
-
-
-
-
-                </p>
-            </div>
+                    <!-- next day -->
+                    {% for day in next_days_forecast %}
+                    <div class="col p-3 bg-dark border">
+                        <p class="lead">next</p>
+                        <hr>
+                        <h4>weather icon: {{ day.weather.0.icon }}</h4>
+                        <p class="lead">{{ day.weather.0.description }}</p>
+                        <h1 class="display-6">{{ day.main.temp }}°C</h1>
+                        <p><small>
+                            max: {{ day.main.temp_max }}°C<br>
+                            min: {{ day.main.temp_min }}°C
+                        </small></p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </p>
         </div>
     </div>
-
 </div>
 
 {% endblock content %}
