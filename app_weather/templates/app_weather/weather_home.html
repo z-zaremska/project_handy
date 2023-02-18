@@ -24,37 +24,38 @@
     <div class="card">
         <h3 class="card-header text-center bg-dark text-white">
             <svg class="bi" width="35" height="35"><use xlink:href="#bi-geo-alt"/></svg>
-            {{name}} ({{country_code}})
+            {{country}}
         </h3>
         <!--5 days forecast-->
         <div class="card-body text-center">
             <div class="row align-items-md-stretch">
                 <!--Today-->
                 <div class="col-3 p-3 bg-primary">
-                    <p class="lead">{{ today_forecast.dt }}</p>
+                    <p class="lead">{{ today.datetime }}</p>
                     <hr>
-                    <img src="http://openweathermap.org/img/w/{{ today_forecast.weather.0.icon }}.png" width="100"/>
-                    <p class="lead">{{ today_forecast.weather.0.description }}</p>
-                    <h1 class="display-4">{{ today_forecast.main.temp }}°C</h1>
+                    {{ today.icon }}
+                    <p class="lead">{{ today.conditions }}</p>
+                    <h1 class="display-4">{{ today.temp }}°C</h1>
+                    <p>{{ today.description }}</p>
                     <p><small>
-                        max: {{ today_forecast.main.temp_max }}°C<br>
-                        min: {{ today_forecast.main.temp_min }}°C<br>
-                        clouds: {{ today_forecast.clouds.all }}%<br>
-                        wind speed: {{ today_forecast.wind.speed }}<br>
-                        humidity: {{ today_forecast.main.humidity }}%
+                        max: {{ today.tempmax }}°C<br>
+                        min: {{ today.tempmin }}°C<br>
+                        clouds: {{ today.cloudcover }}%<br>
+                        wind speed: {{ today.windspeed }} km/h<br>
+                        humidity: {{ today.humidity }}%
                     </small></p>
                 </div>
                 <!-- next day -->
-                {% for day in next_days_forecast %}
+                {% for day in next_days %}
                 <div class="col p-3 bg-dark border">
-                    <p class="lead">{{ day.dt }}</p>
+                    <p class="lead">{{ day.datetime }}</p>
                     <hr>
-                    <img src="http://openweathermap.org/img/w/{{ day.weather.0.icon }}.png" width=100/>
-                    <p class="lead">{{ day.weather.0.description }}</p>
-                    <h1 class="display-6">{{ day.main.temp }}°C</h1>
+                    {{ day.icon }}
+                    <p class="lead">{{ day.conditions }}</p>
+                    <h1 class="display-6">{{ day.temp }}°C</h1>
                     <p><small>
-                        max: {{ day.main.temp_max }}°C<br>
-                        min: {{ day.main.temp_min }}°C
+                        max: {{ day.tempmax }}°C<br>
+                        min: {{ day.tempmin }}°C
                     </small></p>
                 </div>
                 {% endfor %}
