@@ -14,13 +14,30 @@
 {% block content %}
 
 <div class="col mx-auto py-md-4">
-    <!--City search-->
-    <form method="POST">
-        {% csrf_token %}
-        <input type="text" placeholder="Enter city name" name="city"/>
-        <button type="submit">Go</button>
-    </form>
     <!-- Weather forecast -->
+    {% if no_such_city %}
+        <div class="card">
+            <h3 class="card-header text-center bg-dark text-white">
+                {{ no_such_city }}
+            </h3>
+            <!--if no city -->
+            <div class="card-body text-center">
+                <div class="row align-items-center">
+                    <p class="lead">Please try something else.</p>
+                    <!--City search form -->
+                    <div class="col-6 p-3 align-self-center">
+                        <form method="POST">
+                            {% csrf_token %}
+                            <div class="input-group mb-3">
+                              <input type="text" class="form-control" placeholder="Enter city name" name="city" aria-describedby="button-addon2">
+                              <button class="btn btn-primary btn-sm" type="submit" id="button-addon2">Go</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
     <div class="card">
         <h3 class="card-header text-center bg-dark text-white">
             <svg class="bi" width="35" height="35"><use xlink:href="#bi-geo-alt"/></svg>
@@ -62,6 +79,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
 {% endblock content %}
