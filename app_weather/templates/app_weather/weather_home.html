@@ -33,7 +33,7 @@
                 <div class="col-3 p-3 bg-primary">
                     <p class="lead">{{ today.datetime }}</p>
                     <hr>
-                    {{ today.icon }}
+                    <h1 class="display-4"><i class="wi {{ today.icon }}"></i></h1>
                     <p class="lead">{{ today.conditions }}</p>
                     <h1 class="display-4">{{ today.temp }}°C</h1>
                     <p>{{ today.description }}</p>
@@ -50,7 +50,7 @@
                 <div class="col p-3 bg-dark border">
                     <p class="lead">{{ day.datetime }}</p>
                     <hr>
-                    {{ day.icon }}
+                    <h1 class="display-4"><i class="wi {{ day.icon }}"></i></h1>
                     <p class="lead">{{ day.conditions }}</p>
                     <h1 class="display-6">{{ day.temp }}°C</h1>
                     <p><small>
